@@ -35,6 +35,7 @@ import {
   MOCK_KPI_REPORTS,
   MOCK_QUOTES,
   MOCK_WORK_ORDERS,
+  Client,
   Employee,
   WorkOrder,
 } from '@/lib/mockData'
@@ -82,6 +83,17 @@ function getQuoteStatusBadge(status: typeof MOCK_QUOTES[number]['status']) {
       return { label: 'Rascunho', border: 'rgba(111,184,255,0.5)', bg: 'rgba(111,184,255,0.2)' }
     case 'rejected':
       return { label: 'Recusado', border: 'rgba(255,107,122,0.58)', bg: 'rgba(255,107,122,0.2)' }
+    default:
+      return { label: 'Indefinido', border: 'rgba(120,147,196,0.4)', bg: 'rgba(120,147,196,0.14)' }
+  }
+}
+
+function getClientStatusBadge(status: Client['status']) {
+  switch (status) {
+    case 'active':
+      return { label: 'Ativo', border: 'rgba(61,231,175,0.55)', bg: 'rgba(61,231,175,0.2)' }
+    case 'inactive':
+      return { label: 'Inativo', border: 'rgba(255,107,122,0.58)', bg: 'rgba(255,107,122,0.2)' }
     default:
       return { label: 'Indefinido', border: 'rgba(120,147,196,0.4)', bg: 'rgba(120,147,196,0.14)' }
   }
@@ -1042,6 +1054,8 @@ function EmployeesTab({ employees }: { employees: Employee[] }) {
 }
 
 function ClientsTab({ branchId }: { branchId: string }) {
+  const [expandedClientId, setExpandedClientId] = useState<string | null>(null)
+
   const filteredClients = useMemo(() => {
     if (branchId === 'all') return MOCK_CLIENTS
     return MOCK_CLIENTS.filter((client) => client.branch_id === branchId)
@@ -1066,6 +1080,11 @@ function ClientsTab({ branchId }: { branchId: string }) {
       return `${index === 0 ? 'M' : 'L'} ${x},${y}`
     })
     .join(' ')
+
+  const getContractValue = (value: string) => {
+    const normalized = value.replace(/[^\d,]/g, '').replace(/\./g, '').replace(',', '.')
+    return Number.parseFloat(normalized) || 0
+  }
 
   return (
     <div className="space-y-5">
@@ -1141,20 +1160,85 @@ function ClientsTab({ branchId }: { branchId: string }) {
       </div>
 
       <div className="grid gap-3">
-        {filteredClients.map((client) => (
-          <div key={client.id} className="metal-card p-4 md:p-5">
-            <div className="flex flex-wrap justify-between items-center gap-3">
-              <div>
-                <p className="font-semibold text-lg">{client.name}</p>
-                <p className="text-xs text-[var(--admin-text-muted)]">{client.segment} | {client.contact_person}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-[var(--admin-text-muted)]">Contrato</p>
-                <p className="text-sm text-[var(--admin-green)] font-semibold">{client.contract_value}</p>
-              </div>
-            </div>
-          </div>
-        ))}
+        {filteredClients.map((client) => {
+          const isExpanded = expandedClientId === client.id
+          const clientBadge = getClientStatusBadge(client.status)
+          const branch = MOCK_BRANCHES.find((item) => item.id === client.branch_id)
+          const contractValue = getContractValue(client.contract_value)
+          const annualProjection = contractValue * 12
+          const contractHealth = client.status === 'active' ? 'Saudável' : 'Revisar'
+
+          return (
+            <motion.div
+              key={client.id}
+              className="metal-card p-4 md:p-5"
+              layout
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <button
+                type="button"
+                onClick={() => setExpandedClientId((prev) => (prev === client.id ? null : client.id))}
+                className="w-full text-left"
+              >
+                <div className="flex flex-wrap justify-between items-center gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-lg truncate">{client.name}</p>
+                    <p className="text-xs text-[var(--admin-text-muted)]">{client.segment} | {client.contact_person}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="text-[10px] uppercase font-semibold tracking-wide px-2.5 py-1 rounded-full border text-[var(--admin-text)]"
+                      style={{ borderColor: clientBadge.border, background: clientBadge.bg }}
+                    >
+                      {clientBadge.label}
+                    </span>
+                    <div className="text-right">
+                      <p className="text-xs text-[var(--admin-text-muted)]">Contrato</p>
+                      <p className="text-sm text-[var(--admin-green)] font-semibold">{client.contract_value}</p>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 text-[var(--admin-text-muted)] transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                  </div>
+                </div>
+              </button>
+
+              {isExpanded && (
+                <motion.div
+                  className="mt-4 pt-4 border-t border-[rgba(120,147,196,0.2)]"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.22 }}
+                >
+                  <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-3 text-sm">
+                    <div className="metal-panel rounded-xl p-3 border border-[rgba(120,147,196,0.2)]">
+                      <p className="text-[var(--admin-text-muted)] text-xs">Contato principal</p>
+                      <p className="font-semibold">{client.contact_person}</p>
+                      <p className="text-xs mt-1 text-[var(--admin-text-muted)]">{client.email}</p>
+                      <p className="text-xs text-[var(--admin-text-muted)]">{client.phone}</p>
+                    </div>
+                    <div className="metal-panel rounded-xl p-3 border border-[rgba(120,147,196,0.2)]">
+                      <p className="text-[var(--admin-text-muted)] text-xs">Escopo contratado</p>
+                      <p className="font-semibold">{client.segment}</p>
+                      <p className="text-xs mt-1 text-[var(--admin-text-muted)]">Filial responsável: {branch?.name || 'Não definida'}</p>
+                      <p className="text-xs text-[var(--admin-text-muted)]">Último atendimento: {new Date(client.last_service_date).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div className="metal-panel rounded-xl p-3 border border-[rgba(120,147,196,0.2)]">
+                      <p className="text-[var(--admin-text-muted)] text-xs">Indicadores do contrato</p>
+                      <p className="font-semibold text-[var(--admin-green)]">R$ {Math.round(contractValue).toLocaleString('pt-BR')} / ciclo</p>
+                      <p className="text-xs mt-1 text-[var(--admin-text-muted)]">Projeção anual: R$ {Math.round(annualProjection).toLocaleString('pt-BR')}</p>
+                      <p className="text-xs text-[var(--admin-text-muted)]">Saúde contratual: {contractHealth}</p>
+                    </div>
+                    <div className="metal-panel rounded-xl p-3 border border-[rgba(120,147,196,0.2)]">
+                      <p className="text-[var(--admin-text-muted)] text-xs">Resumo gerencial</p>
+                      <p className="font-semibold">Conta monitorada no cockpit</p>
+                      <p className="text-xs mt-1 text-[var(--admin-text-muted)]">Nível de prioridade: {client.status === 'active' ? 'Normal' : 'Revisão imediata'}</p>
+                      <p className="text-xs text-[var(--admin-text-muted)]">Ação recomendada: {client.status === 'active' ? 'Expandir contrato' : 'Reativar relacionamento'}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
+          )
+        })}
       </div>
     </div>
   )
