@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Eye, EyeOff, Zap, LogIn, AlertCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabaseClient'
 
@@ -75,6 +76,17 @@ export default function LoginPage() {
           </Link>
           <h1 className="text-2xl font-bold text-white">Acesso Restrito</h1>
           <p className="text-slate-400 text-sm mt-2">Portal de colaboradores e clientes</p>
+        </div>
+
+        <div className="glass rounded-2xl p-2 mb-4 overflow-hidden">
+          <Image
+            src="/images/generated/login-portal-ai.jpg"
+            alt="Portal digital de acesso para clientes e colaboradores"
+            width={1344}
+            height={768}
+            className="w-full h-auto rounded-xl"
+            priority
+          />
         </div>
 
         {/* Card */}

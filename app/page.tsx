@@ -136,7 +136,7 @@ export default function HomePage() {
               <div className="absolute -inset-6 rounded-[2rem] bg-[radial-gradient(circle,rgba(39,216,255,0.25),transparent_70%)] blur-3xl" />
 
               <div className="landing-panel relative rounded-[2rem] overflow-hidden mb-4 animate-float">
-                <Image src="/images/landing/client-hero.svg" alt="Painel de atendimento para clientes" width={1200} height={900} className="w-full h-auto" priority />
+                <Image src="/images/generated/landing-hero-ai.jpg" alt="Equipe tecnica em manutencao predial" width={1536} height={1024} className="w-full h-auto" priority />
                 <div className="landing-panel absolute top-5 right-5 rounded-xl px-4 py-3">
                   <p className="text-[10px] uppercase tracking-[0.15em] landing-muted">Chamado ativo</p>
                   <p className="text-xl font-black">Em andamento</p>
@@ -145,10 +145,10 @@ export default function HomePage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="landing-panel rounded-2xl overflow-hidden animate-float-delayed">
-                  <Image src="/images/landing/service-facilities.svg" alt="Gerenciamento de facilities" width={900} height={560} className="w-full h-auto" />
+                  <Image src="/images/generated/about-team-ai.jpg" alt="Equipe de facilities em planejamento operacional" width={1344} height={768} className="w-full h-auto" />
                 </div>
                 <div className="landing-panel rounded-2xl overflow-hidden animate-float">
-                  <Image src="/images/landing/quote-flow.svg" alt="Fluxo de orcamento automatico" width={900} height={560} className="w-full h-auto" />
+                  <Image src="/images/generated/quote-flow-ai.jpg" alt="Fluxo digital de orcamento automatico" width={1344} height={768} className="w-full h-auto" />
                 </div>
               </div>
             </motion.div>
@@ -179,7 +179,7 @@ export default function HomePage() {
             </motion.article>
 
             <motion.div className="landing-panel rounded-[2rem] overflow-hidden" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={1}>
-              <Image src="/images/landing/client-support.svg" alt="Equipe acompanhando atendimento e suporte" width={800} height={560} className="w-full h-full object-cover" />
+              <Image src="/images/generated/about-team-ai.jpg" alt="Equipe acompanhando atendimento e suporte" width={1344} height={768} className="w-full h-full object-cover" />
             </motion.div>
           </div>
         </section>
@@ -195,19 +195,19 @@ export default function HomePage() {
               {
                 title: 'Condominios comerciais e residenciais',
                 text: 'Rotina de manutencao recorrente, controle de SLAs e atendimento rapido para demandas criticas.',
-                image: '/images/landing/segment-condominios.svg',
+                image: '/images/generated/segment-condominios-ai.jpg',
                 icon: Building2,
               },
               {
                 title: 'Operacoes corporativas',
                 text: 'Suporte para predios administrativos, lojas e unidades de atendimento com rastreabilidade completa.',
-                image: '/images/landing/segment-corporativo.svg',
+                image: '/images/generated/segment-corporativo-ai.jpg',
                 icon: Gauge,
               },
               {
                 title: 'Ambientes industriais',
                 text: 'Padroes tecnicos para ativos criticos, continuidade operacional e seguranca de planta.',
-                image: '/images/landing/segment-industrial.svg',
+                image: '/images/generated/segment-industrial-ai.jpg',
                 icon: Factory,
               },
             ].map((item, idx) => {
@@ -318,18 +318,18 @@ export default function HomePage() {
             </motion.article>
 
             <motion.div className="landing-panel rounded-[2rem] overflow-hidden" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={1}>
-              <Image src="/images/landing/quote-flow.svg" alt="Fluxo de orcamento em 4 etapas" width={900} height={560} className="w-full h-full object-cover" />
+              <Image src="/images/generated/quote-flow-ai.jpg" alt="Fluxo de orcamento em 4 etapas" width={1344} height={768} className="w-full h-full object-cover" />
             </motion.div>
           </div>
         </section>
 
         <section id="acompanhamento" className="max-w-7xl mx-auto px-5 md:px-8 pb-14 md:pb-20 grid lg:grid-cols-2 gap-6">
           <motion.div className="landing-panel rounded-[2rem] overflow-hidden" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={0}>
-            <Image src="/images/landing/client-support.svg" alt="Acompanhamento de suporte em tempo real" width={800} height={560} className="w-full h-auto" />
+            <Image src="/images/generated/segment-corporativo-ai.jpg" alt="Acompanhamento de suporte em tempo real" width={1344} height={768} className="w-full h-auto" />
           </motion.div>
 
           <motion.div className="landing-panel rounded-[2rem] overflow-hidden" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={1}>
-            <Image src="/images/landing/client-service.svg" alt="Servico em execucao com equipe tecnica" width={800} height={560} className="w-full h-auto" />
+            <Image src="/images/generated/segment-industrial-ai.jpg" alt="Servico em execucao com equipe tecnica" width={1344} height={768} className="w-full h-auto" />
           </motion.div>
         </section>
 

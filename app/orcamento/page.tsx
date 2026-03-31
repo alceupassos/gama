@@ -444,7 +444,7 @@ export default function QuotePage() {
 
           <aside className="landing-panel rounded-3xl p-5 md:p-6 lg:sticky lg:top-28">
             <div className="rounded-2xl overflow-hidden border border-[var(--landing-border)] mb-5">
-              <Image src="/images/landing/client-support.svg" alt="Painel de atendimento" width={800} height={560} className="w-full h-auto" />
+              <Image src="/images/generated/quote-flow-ai.jpg" alt="Painel de atendimento e simulacao de orcamento" width={1344} height={768} className="w-full h-auto" />
             </div>
 
             <h3 className="font-bold text-lg">Resumo automático</h3>
