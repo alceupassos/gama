@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, type Variants } from 'framer-motion'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import {
   Activity,
   AlertTriangle,
@@ -38,7 +39,7 @@ import {
   WorkOrder,
 } from '@/lib/mockData'
 
-type Tab = 'overview' | 'os' | 'employees' | 'clients' | 'quotes' | 'business'
+type Tab = 'overview' | 'owner' | 'os' | 'employees' | 'clients' | 'quotes' | 'business'
 
 const cardEnter: Variants = {
   hidden: { opacity: 0, y: 22, scale: 0.98 },
@@ -308,6 +309,7 @@ export default function AdminDashboard() {
           <nav className="flex-1 p-4 space-y-2">
             {[
               { id: 'overview', label: 'Dashboard', icon: TrendingUp },
+              { id: 'owner', label: 'Cockpit do dono', icon: Activity },
               { id: 'business', label: 'Gestão do negócio', icon: BriefcaseBusiness },
               { id: 'os', label: 'Ordens de Serviço', icon: FileText },
               { id: 'employees', label: 'Equipe', icon: Users },
@@ -346,6 +348,8 @@ export default function AdminDashboard() {
               <h1 className="text-lg md:text-2xl font-bold">
                 {activeTab === 'overview'
                   ? 'Dashboard Executivo'
+                  : activeTab === 'owner'
+                  ? 'Cockpit do Dono'
                   : activeTab === 'business'
                   ? 'Gestão do Negócio'
                   : activeTab === 'os'
@@ -396,6 +400,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="flex items-center gap-3">
+              <ThemeToggle />
               <button className="relative p-2 rounded-lg border border-[rgba(120,147,196,0.35)] text-[var(--admin-text-muted)] hover:text-white">
                 <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[var(--admin-cyan)] pulse-soft" />
                 <Calendar className="w-4 h-4" />
@@ -406,6 +411,7 @@ export default function AdminDashboard() {
 
           <div className="p-5 md:p-8 max-w-[1280px] w-full mx-auto space-y-8">
             {activeTab === 'overview' && <OverviewTab employees={filteredEmployees} workOrders={filteredOS} />}
+            {activeTab === 'owner' && <OwnerCockpitTab workOrders={filteredOS} employees={filteredEmployees} />}
             {activeTab === 'business' && <BusinessManagementTab workOrders={filteredOS} employees={filteredEmployees} />}
             {activeTab === 'os' && <OSTab workOrders={filteredOS} />}
             {activeTab === 'employees' && <EmployeesTab employees={filteredEmployees} />}
@@ -488,6 +494,260 @@ function OverviewTab({ employees, workOrders }: { employees: Employee[]; workOrd
           </button>
         </div>
       </section>
+    </div>
+  )
+}
+
+function OwnerCockpitTab({ workOrders, employees }: { workOrders: WorkOrder[]; employees: Employee[] }) {
+  const inProgress = workOrders.filter((order) => order.status === 'in_progress').length
+  const done = workOrders.filter((order) => order.status === 'done').length
+  const pending = workOrders.filter((order) => order.status === 'pending' || order.status === 'scheduled').length
+  const highPriority = workOrders.filter((order) => order.priority === 'high').length
+  const onlineTeams = employees.filter((employee) => employee.status === 'online').length
+
+  const recurringContracts = MOCK_CLIENTS.reduce((acc, client) => {
+    const normalized = client.contract_value.replace(/[^\d,]/g, '').replace(/\./g, '').replace(',', '.')
+    return acc + (Number.parseFloat(normalized) || 0)
+  }, 0)
+
+  const pipelineForecast = MOCK_QUOTES
+    .filter((quote) => quote.status === 'approved' || quote.status === 'pending')
+    .reduce((acc, quote) => {
+      const normalized = quote.value.replace(/[^\d,]/g, '').replace(/\./g, '').replace(',', '.')
+      return acc + (Number.parseFloat(normalized) || 0)
+    }, 0)
+
+  const productivity = Math.round((done / Math.max(1, workOrders.length)) * 100)
+  const teamLoad = Math.min(99, Math.round((inProgress / Math.max(1, employees.length)) * 100) + 48)
+  const cashHealth = Math.max(58, Math.min(95, Math.round((recurringContracts / 1000) * 1.2)))
+
+  const revenueTrend = [76, 82, 78, 88, 84, 91, 94, 98, 96, 102]
+  const costTrend = [54, 58, 55, 61, 63, 64, 68, 70, 71, 73]
+  const branchMix = [62, 44, 57, 49]
+  const contractMix = [40, 31, 22, 17]
+  const radarValues = [90, 78, 88, 83, 69]
+  const heatStrip = [1, 3, 4, 2, 5, 6, 3, 2, 4, 5, 2, 1, 3, 4, 2, 5]
+
+  const chartWidth = 360
+  const chartHeight = 130
+  const buildPath = (points: number[], max: number) =>
+    points
+      .map((point, index) => {
+        const x = (index / (points.length - 1)) * chartWidth
+        const y = chartHeight - (point / max) * chartHeight
+        return `${index === 0 ? 'M' : 'L'} ${x},${y}`
+      })
+      .join(' ')
+
+  const revenuePath = buildPath(revenueTrend, 110)
+  const costPath = buildPath(costTrend, 110)
+
+  const radarCenterX = 120
+  const radarCenterY = 90
+  const radarRadius = 62
+  const radarAngle = (Math.PI * 2) / radarValues.length
+
+  const radarPoints = radarValues
+    .map((value, index) => {
+      const angle = -Math.PI / 2 + index * radarAngle
+      const radius = (value / 100) * radarRadius
+      const x = radarCenterX + Math.cos(angle) * radius
+      const y = radarCenterY + Math.sin(angle) * radius
+      return `${x},${y}`
+    })
+    .join(' ')
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        {[
+          { label: 'Receita Recorrente', value: `R$ ${Math.round(recurringContracts).toLocaleString('pt-BR')}`, chip: 'MRR', tone: 'var(--admin-green)' },
+          { label: 'Pipeline Previsto', value: `R$ ${Math.round(pipelineForecast).toLocaleString('pt-BR')}`, chip: '90 dias', tone: 'var(--admin-cyan)' },
+          { label: 'Saúde de Caixa', value: `${cashHealth}%`, chip: 'Liquidez', tone: 'var(--admin-blue)' },
+          { label: 'Carga Operacional', value: `${teamLoad}%`, chip: `${inProgress} OS ativas`, tone: 'var(--admin-amber)' },
+          { label: 'Risco Crítico', value: `${highPriority}`, chip: 'Prioridade alta', tone: 'var(--admin-red)' },
+        ].map((item, index) => (
+          <motion.div key={item.label} className="metal-card p-5" variants={cardEnter} initial="hidden" animate="show" custom={index}>
+            <div className="metal-shine" />
+            <span className="text-[10px] uppercase tracking-wider px-2 py-1 rounded-full inline-block mb-3" style={{ background: 'rgba(39,216,255,0.12)', color: 'var(--admin-cyan)' }}>
+              {item.chip}
+            </span>
+            <p className="kpi-label">{item.label}</p>
+            <p className="kpi-value mt-2" style={{ color: item.tone }}>{item.value}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="grid xl:grid-cols-3 gap-4">
+        <div className="metal-card p-5 xl:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <p className="kpi-label">Fluxo de Caixa (Receita x Custo) | 10 semanas</p>
+            <span className="text-xs text-[var(--admin-green)] font-semibold">Margem 29%</span>
+          </div>
+          <div className="metal-card-plot h-48 p-4">
+            <svg viewBox={`0 0 ${chartWidth} ${chartHeight}`} className="w-full h-full">
+              <defs>
+                <linearGradient id="owner-rev" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor="#3de7af" />
+                  <stop offset="100%" stopColor="#27d8ff" />
+                </linearGradient>
+                <linearGradient id="owner-cost" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor="#ffb347" />
+                  <stop offset="100%" stopColor="#ff6b7a" />
+                </linearGradient>
+              </defs>
+              <motion.path d={revenuePath} fill="none" stroke="url(#owner-rev)" strokeWidth="4" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1 }} />
+              <motion.path d={costPath} fill="none" stroke="url(#owner-cost)" strokeWidth="3" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.2, delay: 0.1 }} />
+              {revenueTrend.map((point, index) => {
+                const x = (index / (revenueTrend.length - 1)) * chartWidth
+                const y = chartHeight - (point / 110) * chartHeight
+                return <circle key={`rev-${point}-${index}`} cx={x} cy={y} r="3.8" fill="#3de7af" className="pulse-soft" />
+              })}
+            </svg>
+          </div>
+        </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Capacidade 3D</p>
+          <div className="metal-card-plot h-48 p-4 flex items-center justify-center">
+            <div className="relative w-36 h-36">
+              <div
+                className="absolute inset-0 rounded-full rotate-slow"
+                style={{ background: `conic-gradient(#27d8ff 0deg ${teamLoad * 3.6}deg, rgba(120,147,196,0.2) ${teamLoad * 3.6}deg 360deg)` }}
+              />
+              <div
+                className="absolute inset-4 rounded-full rotate-slow"
+                style={{ animationDirection: 'reverse', background: `conic-gradient(#3de7af 0deg ${productivity * 3.6}deg, rgba(120,147,196,0.16) ${productivity * 3.6}deg 360deg)` }}
+              />
+              <div className="absolute inset-9 rounded-full bg-[var(--admin-bg)] border border-[rgba(120,147,196,0.28)] grid place-items-center text-center">
+                <p className="kpi-value leading-none">{productivity}%</p>
+                <p className="text-[10px] text-[var(--admin-text-muted)] uppercase">Eficiência</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid xl:grid-cols-3 gap-4">
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Filiais (Barras 3D)</p>
+          <div className="metal-card-plot h-44 px-5 py-4 flex items-end justify-around">
+            {branchMix.map((value, index) => (
+              <motion.div key={`branch-${value}-${index}`} className="flex flex-col items-center gap-2" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.08 }}>
+                <div className="bar-3d" style={{ ['--h' as string]: `${Math.max(28, value)}%` }} />
+                <span className="text-[10px] text-[var(--admin-text-muted)]">{MOCK_BRANCHES[index]?.city ?? `B${index + 1}`}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Mix de Contratos (Camadas)</p>
+          <div className="metal-card-plot h-44 p-4 flex flex-col justify-center gap-3">
+            {contractMix.map((layer, index) => (
+              <motion.div
+                key={`contract-${layer}-${index}`}
+                className="h-6 rounded-md"
+                initial={{ width: '14%', opacity: 0 }}
+                animate={{ width: `${layer + 48}%`, opacity: 1 }}
+                transition={{ delay: index * 0.1 }}
+                style={{
+                  background: index === 0
+                    ? 'linear-gradient(90deg, rgba(39,216,255,0.95), rgba(111,184,255,0.9))'
+                    : index === 1
+                    ? 'linear-gradient(90deg, rgba(61,231,175,0.9), rgba(39,216,255,0.75))'
+                    : index === 2
+                    ? 'linear-gradient(90deg, rgba(255,179,71,0.92), rgba(255,139,69,0.82))'
+                    : 'linear-gradient(90deg, rgba(255,107,122,0.9), rgba(170,63,74,0.9))',
+                  boxShadow: '0 8px 18px rgba(0,0,0,0.35)',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Grade de Alertas</p>
+          <div className="metal-card-plot h-44 p-3 grid grid-cols-4 gap-2">
+            {heatStrip.map((value, index) => (
+              <motion.div
+                key={`heat-${value}-${index}`}
+                className="rounded-md border border-[rgba(120,147,196,0.2)]"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.015 }}
+                style={{
+                  background: value >= 5
+                    ? 'rgba(255,107,122,0.72)'
+                    : value >= 3
+                    ? 'rgba(255,179,71,0.64)'
+                    : 'rgba(39,216,255,0.35)',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid xl:grid-cols-3 gap-4">
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Radar Executivo 3D</p>
+          <div className="metal-card-plot h-48 p-3 flex items-center justify-center">
+            <svg viewBox="0 0 240 180" className="w-full h-full">
+              {[0.25, 0.5, 0.75, 1].map((level) => {
+                const points = radarValues
+                  .map((_, index) => {
+                    const angle = -Math.PI / 2 + index * radarAngle
+                    const radius = radarRadius * level
+                    const x = radarCenterX + Math.cos(angle) * radius
+                    const y = radarCenterY + Math.sin(angle) * radius
+                    return `${x},${y}`
+                  })
+                  .join(' ')
+
+                return <polygon key={`ring-${level}`} points={points} fill="none" stroke="rgba(120,147,196,0.24)" strokeWidth="1" />
+              })}
+              {radarValues.map((_, index) => {
+                const angle = -Math.PI / 2 + index * radarAngle
+                const x = radarCenterX + Math.cos(angle) * radarRadius
+                const y = radarCenterY + Math.sin(angle) * radarRadius
+                return <line key={`axis-${index}`} x1={radarCenterX} y1={radarCenterY} x2={x} y2={y} stroke="rgba(120,147,196,0.2)" />
+              })}
+              <motion.polygon
+                points={radarPoints}
+                fill="rgba(39,216,255,0.28)"
+                stroke="#27d8ff"
+                strokeWidth="2"
+                initial={{ opacity: 0.2, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.7 }}
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div className="metal-card p-5 xl:col-span-2">
+          <p className="kpi-label mb-4">Resumo de Prioridades do Dono</p>
+          <div className="grid md:grid-cols-4 gap-3 text-sm">
+            <div className="metal-panel p-3 rounded-xl border border-[rgba(120,147,196,0.2)]">
+              <p className="text-[var(--admin-text-muted)] text-xs">Financeiro</p>
+              <p className="font-semibold text-[var(--admin-green)]">Margem preservada e fluxo positivo</p>
+            </div>
+            <div className="metal-panel p-3 rounded-xl border border-[rgba(120,147,196,0.2)]">
+              <p className="text-[var(--admin-text-muted)] text-xs">Operação</p>
+              <p className="font-semibold text-[var(--admin-cyan)]">{inProgress} OS em execução agora</p>
+            </div>
+            <div className="metal-panel p-3 rounded-xl border border-[rgba(120,147,196,0.2)]">
+              <p className="text-[var(--admin-text-muted)] text-xs">Equipe</p>
+              <p className="font-semibold text-[var(--admin-blue)]">{onlineTeams} técnicos online em campo</p>
+            </div>
+            <div className="metal-panel p-3 rounded-xl border border-[rgba(120,147,196,0.2)]">
+              <p className="text-[var(--admin-text-muted)] text-xs">Risco</p>
+              <p className="font-semibold text-[var(--admin-red)]">{pending} filas pendentes, {highPriority} críticos</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -603,6 +863,7 @@ function ClientsTab({ branchId }: { branchId: string }) {
 }
 
 function BusinessManagementTab({ workOrders, employees }: { workOrders: WorkOrder[]; employees: Employee[] }) {
+  const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d')
   const osDone = workOrders.filter((order) => order.status === 'done').length
   const osInProgress = workOrders.filter((order) => order.status === 'in_progress').length
   const highPriority = workOrders.filter((order) => order.priority === 'high').length
@@ -612,13 +873,46 @@ function BusinessManagementTab({ workOrders, employees }: { workOrders: WorkOrde
   const margin = 34
   const cash = 67
 
-  const financeBars = [44, 51, 56, 70, 63, 78, 82, 90]
-  const clientRadar = [72, 88, 76, 69, 84]
-  const segments = [38, 27, 21, 14]
+  const financeBars = period === '7d'
+    ? [35, 44, 58, 47, 62, 70, 66, 74]
+    : period === '90d'
+    ? [48, 55, 61, 68, 64, 76, 83, 92]
+    : [44, 51, 56, 70, 63, 78, 82, 90]
+  const clientRadar = period === '7d' ? [68, 82, 72, 61, 76] : period === '90d' ? [74, 90, 81, 74, 86] : [72, 88, 76, 69, 84]
+  const segments = period === '7d' ? [35, 24, 18, 12] : period === '90d' ? [42, 31, 26, 16] : [38, 27, 21, 14]
   const riskMatrix = [5, 2, 1, 3, 4, 6, 2, 0, 3, 7, 5, 1, 2, 3, 6, 8]
+  const efficiencyGrid = [72, 81, 67, 74, 88, 69, 76, 84, 71, 79, 90, 74]
 
   return (
     <div className="space-y-6">
+      <div className="metal-card p-4 md:p-5">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <p className="kpi-label">Janela de análise</p>
+            <p className="text-sm text-[var(--admin-text-muted)]">Visão integrada para decisões de crescimento, risco e eficiência operacional.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {[
+              { id: '7d', label: '7 dias' },
+              { id: '30d', label: '30 dias' },
+              { id: '90d', label: '90 dias' },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setPeriod(item.id as '7d' | '30d' | '90d')}
+                className={`px-3 py-2 rounded-lg text-xs border transition-colors ${
+                  period === item.id
+                    ? 'bg-[rgba(39,216,255,0.18)] border-[rgba(39,216,255,0.5)] text-white'
+                    : 'border-[rgba(120,147,196,0.32)] text-[var(--admin-text-muted)] hover:text-white'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {[
           { label: 'Margem Operacional', value: `${margin}%`, tone: 'var(--admin-green)' },
@@ -699,7 +993,7 @@ function BusinessManagementTab({ workOrders, employees }: { workOrders: WorkOrde
         </div>
       </div>
 
-      <div className="grid xl:grid-cols-3 gap-4">
+      <div className="grid xl:grid-cols-4 gap-4">
         <div className="metal-card p-5">
           <p className="kpi-label mb-4">Clientes (Radar 3D)</p>
           <div className="metal-card-plot h-44 p-3 flex items-center justify-center">
@@ -761,6 +1055,27 @@ function BusinessManagementTab({ workOrders, employees }: { workOrders: WorkOrde
             ))}
           </div>
         </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Eficiência por Contrato</p>
+          <div className="metal-card-plot h-44 p-3 grid grid-cols-4 gap-2">
+            {efficiencyGrid.map((value, index) => (
+              <motion.div
+                key={`${value}-${index}`}
+                className="rounded-md border border-[rgba(120,147,196,0.2)] flex items-end justify-center pb-1"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.02 }}
+                style={{
+                  background: `linear-gradient(180deg, rgba(39,216,255,${0.2 + value / 160}), rgba(16,44,84,0.7))`,
+                  boxShadow: value > 84 ? '0 0 16px rgba(61,231,175,0.28)' : 'none',
+                }}
+              >
+                <span className="text-[10px] font-semibold text-[rgba(232,237,247,0.92)]">{value}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="metal-card p-5">
@@ -787,7 +1102,7 @@ function BusinessManagementTab({ workOrders, employees }: { workOrders: WorkOrde
 
       <div className="text-xs text-[var(--admin-text-muted)]">
         Dono do negócio: painel unificado com visão financeira, comercial, operacional, clientes, pessoas e risco em visual 3D gradeado.
-        Concluídas: {osDone} | Em andamento: {osInProgress} | Equipes analisadas: {employees.length}
+        Janela: {period} | Concluídas: {osDone} | Em andamento: {osInProgress} | Equipes analisadas: {employees.length}
       </div>
     </div>
   )

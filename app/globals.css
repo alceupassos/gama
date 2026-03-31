@@ -302,6 +302,29 @@ body {
 
 /* Admin V2 - Industrial Metal Theme */
 :root {
+  --admin-bg: #eaf3ff;
+  --admin-panel: #f7fbff;
+  --admin-panel-soft: #eef4ff;
+  --admin-panel-elevated: #ffffff;
+  --admin-text: #0e2242;
+  --admin-text-muted: #4d6283;
+  --admin-line: rgba(75, 110, 164, 0.25);
+  --admin-cyan: #0ea5d9;
+  --admin-cyan-soft: rgba(14, 165, 217, 0.18);
+  --admin-amber: #d6852f;
+  --admin-green: #1ea978;
+  --admin-red: #d35364;
+  --admin-blue: #3f8cff;
+  --admin-shell-spot-1: rgba(14, 165, 217, 0.18);
+  --admin-shell-spot-2: rgba(214, 133, 47, 0.13);
+  --admin-shell-grad-1: #edf5ff;
+  --admin-shell-grad-2: #e4eefc;
+  --admin-shell-grad-3: #d9e7fa;
+  --admin-grid-line: rgba(79, 115, 168, 0.16);
+  --admin-grid-glow: rgba(14, 165, 217, 0.2);
+}
+
+.dark {
   --admin-bg: #04070d;
   --admin-panel: #0b1220;
   --admin-panel-soft: #0f1728;
@@ -315,15 +338,22 @@ body {
   --admin-green: #3de7af;
   --admin-red: #ff6b7a;
   --admin-blue: #6fb8ff;
+  --admin-shell-spot-1: rgba(39, 216, 255, 0.15);
+  --admin-shell-spot-2: rgba(255, 179, 71, 0.1);
+  --admin-shell-grad-1: #02040a;
+  --admin-shell-grad-2: #050913;
+  --admin-shell-grad-3: #070e1b;
+  --admin-grid-line: rgba(120, 147, 196, 0.08);
+  --admin-grid-glow: rgba(39, 216, 255, 0.18);
 }
 
 .admin-shell {
   min-height: 100vh;
   color: var(--admin-text);
   background:
-    radial-gradient(circle at 15% -10%, rgba(39, 216, 255, 0.15), transparent 42%),
-    radial-gradient(circle at 85% -5%, rgba(255, 179, 71, 0.1), transparent 35%),
-    linear-gradient(160deg, #02040a 0%, #050913 40%, #070e1b 100%);
+    radial-gradient(circle at 15% -10%, var(--admin-shell-spot-1), transparent 42%),
+    radial-gradient(circle at 85% -5%, var(--admin-shell-spot-2), transparent 35%),
+    linear-gradient(160deg, var(--admin-shell-grad-1) 0%, var(--admin-shell-grad-2) 40%, var(--admin-shell-grad-3) 100%);
 }
 
 .admin-grid-bg {
@@ -332,9 +362,9 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    linear-gradient(rgba(120, 147, 196, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(120, 147, 196, 0.08) 1px, transparent 1px),
-    radial-gradient(circle at 50% 0%, rgba(39, 216, 255, 0.18), transparent 45%);
+    linear-gradient(var(--admin-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--admin-grid-line) 1px, transparent 1px),
+    radial-gradient(circle at 50% 0%, var(--admin-grid-glow), transparent 45%);
   background-size: 34px 34px, 34px 34px, auto;
   mask-image: radial-gradient(circle at 50% 35%, black 10%, transparent 78%);
 }
@@ -346,8 +376,8 @@ body {
 
 .metal-panel {
   background:
-    linear-gradient(160deg, rgba(17, 28, 47, 0.9), rgba(11, 18, 32, 0.9)),
-    linear-gradient(120deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0));
+    linear-gradient(160deg, color-mix(in srgb, var(--admin-panel) 90%, white 10%), color-mix(in srgb, var(--admin-panel-soft) 88%, black 12%)),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
   border: 1px solid var(--admin-line);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
@@ -360,12 +390,12 @@ body {
   overflow: hidden;
   border-radius: 1.25rem;
   background:
-    linear-gradient(145deg, rgba(18, 28, 48, 0.96), rgba(10, 16, 31, 0.96));
-  border: 1px solid rgba(120, 147, 196, 0.26);
+    linear-gradient(145deg, color-mix(in srgb, var(--admin-panel-elevated) 88%, white 12%), color-mix(in srgb, var(--admin-panel-soft) 86%, black 14%));
+  border: 1px solid color-mix(in srgb, var(--admin-line) 82%, transparent);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 14px 26px rgba(0, 0, 0, 0.36),
-    0 0 0 1px rgba(39, 216, 255, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 14px 26px color-mix(in srgb, var(--admin-bg) 40%, black 60%),
+    0 0 0 1px color-mix(in srgb, var(--admin-cyan) 20%, transparent);
   transform-style: preserve-3d;
   transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }
@@ -396,11 +426,11 @@ body {
 .metal-card-plot {
   position: relative;
   border-radius: 1rem;
-  border: 1px solid rgba(120, 147, 196, 0.2);
+  border: 1px solid color-mix(in srgb, var(--admin-line) 80%, transparent);
   background:
-    linear-gradient(rgba(120, 147, 196, 0.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(120, 147, 196, 0.08) 1px, transparent 1px),
-    linear-gradient(145deg, rgba(13, 21, 37, 0.9), rgba(8, 14, 27, 0.9));
+    linear-gradient(color-mix(in srgb, var(--admin-line) 58%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--admin-line) 58%, transparent) 1px, transparent 1px),
+    linear-gradient(145deg, color-mix(in srgb, var(--admin-panel-soft) 92%, white 8%), color-mix(in srgb, var(--admin-bg) 92%, black 8%));
   background-size: 24px 24px, 24px 24px, auto;
 }
 
