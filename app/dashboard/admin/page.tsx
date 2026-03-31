@@ -753,8 +753,93 @@ function OwnerCockpitTab({ workOrders, employees }: { workOrders: WorkOrder[]; e
 }
 
 function OSTab({ workOrders }: { workOrders: WorkOrder[] }) {
+  const done = workOrders.filter((os) => os.status === 'done').length
+  const inProgress = workOrders.filter((os) => os.status === 'in_progress').length
+  const pending = workOrders.filter((os) => os.status === 'pending' || os.status === 'scheduled').length
+  const canceled = workOrders.filter((os) => os.status === 'canceled').length
+  const avgProgress = Math.round(workOrders.reduce((acc, os) => acc + os.progress, 0) / Math.max(1, workOrders.length))
+  const assignmentCoverage = Math.round((workOrders.filter((os) => os.tech_id).length / Math.max(1, workOrders.length)) * 100)
+  const backlogBars = [pending + 1, inProgress + 2, done + 2, canceled + 1]
+  const maxBacklog = Math.max(...backlogBars, 1)
+  const dailyRhythm = [62, 58, 71, 65, 79, 84, 73]
+  const rhythmPath = dailyRhythm
+    .map((value, index) => {
+      const x = (index / (dailyRhythm.length - 1)) * 290
+      const y = 112 - (value / 100) * 112
+      return `${index === 0 ? 'M' : 'L'} ${x},${y}`
+    })
+    .join(' ')
+
   return (
     <div className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        {[
+          { label: 'Backlog ativo', value: pending, tone: 'var(--admin-amber)' },
+          { label: 'Execução em campo', value: inProgress, tone: 'var(--admin-cyan)' },
+          { label: 'Concluídas no ciclo', value: done, tone: 'var(--admin-green)' },
+          { label: 'Cobertura de alocação', value: `${assignmentCoverage}%`, tone: 'var(--admin-blue)' },
+          { label: 'Controle de avanço', value: `${avgProgress}%`, tone: 'var(--admin-red)' },
+        ].map((metric, index) => (
+          <motion.div key={metric.label} className="metal-card p-5" variants={cardEnter} initial="hidden" animate="show" custom={index}>
+            <div className="metal-shine" />
+            <p className="kpi-label">{metric.label}</p>
+            <p className="kpi-value mt-2" style={{ color: metric.tone }}>{metric.value}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="grid xl:grid-cols-3 gap-4">
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Backlog x throughput 3D</p>
+          <div className="metal-card-plot h-44 px-5 py-4 flex items-end justify-around">
+            {backlogBars.map((value, index) => (
+              <motion.div key={`${value}-${index}`} className="flex flex-col items-center gap-2" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.08 }}>
+                <div className="bar-3d" style={{ ['--h' as string]: `${Math.max(24, (value / maxBacklog) * 94)}%` }} />
+                <span className="text-[10px] text-[var(--admin-text-muted)]">{['Pendente', 'Execução', 'Concluída', 'Cancelada'][index]}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Ritmo diário da operação</p>
+          <div className="metal-card-plot h-44 p-4">
+            <svg viewBox="0 0 290 112" className="w-full h-full">
+              <defs>
+                <linearGradient id="os-rhythm" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor="#27d8ff" />
+                  <stop offset="100%" stopColor="#3de7af" />
+                </linearGradient>
+              </defs>
+              <motion.path d={rhythmPath} fill="none" stroke="url(#os-rhythm)" strokeWidth="4" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1 }} />
+              {dailyRhythm.map((value, index) => {
+                const x = (index / (dailyRhythm.length - 1)) * 290
+                const y = 112 - (value / 100) * 112
+                return <circle key={`${value}-${index}`} cx={x} cy={y} r="3.5" fill="#27d8ff" className="pulse-soft" />
+              })}
+            </svg>
+          </div>
+        </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Disciplina de execução</p>
+          <div className="metal-card-plot h-44 p-4 flex items-center justify-center">
+            <div className="relative w-36 h-36">
+              <div
+                className="absolute inset-0 rounded-full rotate-slow"
+                style={{ background: `conic-gradient(#27d8ff 0deg ${avgProgress * 3.6}deg, rgba(120,147,196,0.2) ${avgProgress * 3.6}deg 360deg)` }}
+              />
+              <div className="absolute inset-4 rounded-full bg-[var(--admin-bg)] border border-[rgba(120,147,196,0.3)] grid place-items-center">
+                <div className="text-center">
+                  <p className="kpi-value leading-none">{avgProgress}%</p>
+                  <p className="text-[10px] text-[var(--admin-text-muted)] uppercase">Avanço médio</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="flex flex-col md:flex-row md:items-center gap-3 md:justify-between">
         <div className="relative w-full md:max-w-md">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--admin-text-muted)]" />
@@ -802,36 +887,120 @@ function OSTab({ workOrders }: { workOrders: WorkOrder[] }) {
 }
 
 function EmployeesTab({ employees }: { employees: Employee[] }) {
+  const online = employees.filter((employee) => employee.status === 'online').length
+  const busy = employees.filter((employee) => employee.status === 'busy').length
+  const onBreak = employees.filter((employee) => employee.status === 'on_break').length
+  const offline = employees.filter((employee) => employee.status === 'offline').length
+  const avgPunctuality = Math.round(employees.reduce((acc, employee) => acc + employee.kpis.punctuality, 0) / Math.max(1, employees.length))
+  const avgRating = (employees.reduce((acc, employee) => acc + employee.kpis.client_rating, 0) / Math.max(1, employees.length)).toFixed(1)
+  const avgDeliveries = Math.round(employees.reduce((acc, employee) => acc + employee.kpis.os_completed, 0) / Math.max(1, employees.length))
+  const statusGrid = [online, busy, onBreak, offline, online + busy, busy + onBreak, online + 1, offline + 1, avgDeliveries / 10, avgPunctuality / 10, 7, 5]
+  const topPerformers = [...employees]
+    .sort((a, b) => b.kpis.os_completed - a.kpis.os_completed)
+    .slice(0, 5)
+
   return (
-    <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-      {employees.map((emp, idx) => (
-        <motion.div key={emp.id} className="metal-card p-5" variants={cardEnter} initial="hidden" animate="show" custom={idx}>
-          <div className="flex items-start gap-3 mb-4">
-            <SafeAvatar src={emp.avatar_url} alt={emp.full_name} size={56} />
-            <div>
-              <p className="font-semibold leading-tight">{emp.full_name}</p>
-              <p className="text-xs text-[var(--admin-cyan)]">{emp.role}</p>
-              <a href={`tel:${emp.phone}`} className="text-xs text-[var(--admin-text-muted)] inline-flex gap-1 items-center mt-1"><Phone className="w-3 h-3" />{emp.phone}</a>
-            </div>
-          </div>
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        {[
+          { label: 'Efetivo online', value: `${online}/${employees.length}`, tone: 'var(--admin-green)' },
+          { label: 'Times sobrecarga', value: `${busy}`, tone: 'var(--admin-red)' },
+          { label: 'Pontualidade média', value: `${avgPunctuality}%`, tone: 'var(--admin-cyan)' },
+          { label: 'Satisfação média', value: avgRating, tone: 'var(--admin-blue)' },
+          { label: 'Entregas por técnico', value: avgDeliveries, tone: 'var(--admin-amber)' },
+        ].map((metric, index) => (
+          <motion.div key={metric.label} className="metal-card p-5" variants={cardEnter} initial="hidden" animate="show" custom={index}>
+            <div className="metal-shine" />
+            <p className="kpi-label">{metric.label}</p>
+            <p className="kpi-value mt-2" style={{ color: metric.tone }}>{metric.value}</p>
+          </motion.div>
+        ))}
+      </div>
 
-          <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
-            <div className="metal-panel rounded-xl p-2 border border-[rgba(120,147,196,0.2)]">
-              <p className="text-[var(--admin-text-muted)]">Qualidade</p>
-              <p className="font-semibold flex items-center gap-1"><Star className="w-3 h-3 text-[var(--admin-amber)]" />{emp.kpis.client_rating}</p>
-            </div>
-            <div className="metal-panel rounded-xl p-2 border border-[rgba(120,147,196,0.2)]">
-              <p className="text-[var(--admin-text-muted)]">Entregas</p>
-              <p className="font-semibold">{emp.kpis.os_completed} OS</p>
-            </div>
+      <div className="grid xl:grid-cols-3 gap-4">
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Matriz de presença da equipe</p>
+          <div className="metal-card-plot h-44 p-3 grid grid-cols-4 gap-2">
+            {statusGrid.map((value, index) => (
+              <motion.div
+                key={`${value}-${index}`}
+                className="rounded-md border border-[rgba(120,147,196,0.22)]"
+                initial={{ opacity: 0, scale: 0.85 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.02 }}
+                style={{
+                  background: value >= 5
+                    ? 'rgba(61,231,175,0.5)'
+                    : value >= 3
+                    ? 'rgba(39,216,255,0.35)'
+                    : 'rgba(255,107,122,0.5)',
+                }}
+              />
+            ))}
           </div>
+        </div>
 
-          <p className="text-[11px] text-[var(--admin-text-muted)] mb-1">Pontualidade {emp.kpis.punctuality}%</p>
-          <div className="h-2 rounded-full bg-[rgba(120,147,196,0.2)] overflow-hidden">
-            <div className="h-full rounded-full" style={{ width: `${emp.kpis.punctuality}%`, background: 'linear-gradient(90deg, #27d8ff, #6fb8ff)' }} />
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Top produtividade 3D</p>
+          <div className="metal-card-plot h-44 px-5 py-4 flex items-end justify-around">
+            {topPerformers.map((employee, index) => (
+              <motion.div key={employee.id} className="flex flex-col items-center gap-2" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.08 }}>
+                <div className="bar-3d" style={{ ['--h' as string]: `${Math.max(24, Math.min(96, employee.kpis.os_completed / 1.8))}%` }} />
+                <span className="text-[10px] text-[var(--admin-text-muted)]">{employee.full_name.split(' ')[0]}</span>
+              </motion.div>
+            ))}
           </div>
-        </motion.div>
-      ))}
+        </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Governança de disciplina</p>
+          <div className="metal-card-plot h-44 p-4 flex items-center justify-center">
+            <div className="relative w-36 h-36">
+              <div
+                className="absolute inset-0 rounded-full rotate-slow"
+                style={{ background: `conic-gradient(#3de7af 0deg ${avgPunctuality * 3.6}deg, rgba(120,147,196,0.2) ${avgPunctuality * 3.6}deg 360deg)` }}
+              />
+              <div className="absolute inset-4 rounded-full bg-[var(--admin-bg)] border border-[rgba(120,147,196,0.3)] grid place-items-center">
+                <div className="text-center">
+                  <p className="kpi-value leading-none">{avgPunctuality}%</p>
+                  <p className="text-[10px] text-[var(--admin-text-muted)] uppercase">Controle</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {employees.map((emp, idx) => (
+          <motion.div key={emp.id} className="metal-card p-5" variants={cardEnter} initial="hidden" animate="show" custom={idx}>
+            <div className="flex items-start gap-3 mb-4">
+              <SafeAvatar src={emp.avatar_url} alt={emp.full_name} size={56} />
+              <div>
+                <p className="font-semibold leading-tight">{emp.full_name}</p>
+                <p className="text-xs text-[var(--admin-cyan)]">{emp.role}</p>
+                <a href={`tel:${emp.phone}`} className="text-xs text-[var(--admin-text-muted)] inline-flex gap-1 items-center mt-1"><Phone className="w-3 h-3" />{emp.phone}</a>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
+              <div className="metal-panel rounded-xl p-2 border border-[rgba(120,147,196,0.2)]">
+                <p className="text-[var(--admin-text-muted)]">Qualidade</p>
+                <p className="font-semibold flex items-center gap-1"><Star className="w-3 h-3 text-[var(--admin-amber)]" />{emp.kpis.client_rating}</p>
+              </div>
+              <div className="metal-panel rounded-xl p-2 border border-[rgba(120,147,196,0.2)]">
+                <p className="text-[var(--admin-text-muted)]">Entregas</p>
+                <p className="font-semibold">{emp.kpis.os_completed} OS</p>
+              </div>
+            </div>
+
+            <p className="text-[11px] text-[var(--admin-text-muted)] mb-1">Pontualidade {emp.kpis.punctuality}%</p>
+            <div className="h-2 rounded-full bg-[rgba(120,147,196,0.2)] overflow-hidden">
+              <div className="h-full rounded-full" style={{ width: `${emp.kpis.punctuality}%`, background: 'linear-gradient(90deg, #27d8ff, #6fb8ff)' }} />
+            </div>
+          </motion.div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -842,22 +1011,115 @@ function ClientsTab({ branchId }: { branchId: string }) {
     return MOCK_CLIENTS.filter((client) => client.branch_id === branchId)
   }, [branchId])
 
+  const monthlyContracts = filteredClients.reduce((acc, client) => {
+    const normalized = client.contract_value.replace(/[^\d,]/g, '').replace(/\./g, '').replace(',', '.')
+    return acc + (Number.parseFloat(normalized) || 0)
+  }, 0)
+
+  const activeClients = filteredClients.filter((client) => client.status === 'active').length
+  const segmentMap = filteredClients.reduce<Record<string, number>>((acc, client) => {
+    acc[client.segment] = (acc[client.segment] || 0) + 1
+    return acc
+  }, {})
+  const segmentBars = Object.entries(segmentMap).slice(0, 4)
+  const retentionCurve = [76, 82, 88, 91, 93, 95]
+  const retentionPath = retentionCurve
+    .map((value, index) => {
+      const x = (index / (retentionCurve.length - 1)) * 260
+      const y = 110 - (value / 100) * 110
+      return `${index === 0 ? 'M' : 'L'} ${x},${y}`
+    })
+    .join(' ')
+
   return (
-    <div className="grid gap-3">
-      {filteredClients.map((client) => (
-        <div key={client.id} className="metal-card p-4 md:p-5">
-          <div className="flex flex-wrap justify-between items-center gap-3">
-            <div>
-              <p className="font-semibold text-lg">{client.name}</p>
-              <p className="text-xs text-[var(--admin-text-muted)]">{client.segment} | {client.contact_person}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-[var(--admin-text-muted)]">Contrato</p>
-              <p className="text-sm text-[var(--admin-green)] font-semibold">{client.contract_value}</p>
-            </div>
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {[
+          { label: 'Clientes ativos', value: activeClients, tone: 'var(--admin-green)' },
+          { label: 'Receita contratada', value: `R$ ${Math.round(monthlyContracts).toLocaleString('pt-BR')}`, tone: 'var(--admin-cyan)' },
+          { label: 'Segmentos na carteira', value: Object.keys(segmentMap).length, tone: 'var(--admin-blue)' },
+          { label: 'Retenção estimada', value: '95%', tone: 'var(--admin-amber)' },
+        ].map((metric, index) => (
+          <motion.div key={metric.label} className="metal-card p-5" variants={cardEnter} initial="hidden" animate="show" custom={index}>
+            <div className="metal-shine" />
+            <p className="kpi-label">{metric.label}</p>
+            <p className="kpi-value mt-2" style={{ color: metric.tone }}>{metric.value}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="grid xl:grid-cols-3 gap-4">
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Distribuição por segmento (3D)</p>
+          <div className="metal-card-plot h-44 px-5 py-4 flex items-end justify-around">
+            {segmentBars.map(([segment, count], index) => (
+              <motion.div key={segment} className="flex flex-col items-center gap-2" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.08 }}>
+                <div className="bar-3d" style={{ ['--h' as string]: `${Math.max(26, count * 24)}%` }} />
+                <span className="text-[10px] text-[var(--admin-text-muted)]">{segment.split(' ')[0]}</span>
+              </motion.div>
+            ))}
           </div>
         </div>
-      ))}
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Curva de retenção da carteira</p>
+          <div className="metal-card-plot h-44 p-4">
+            <svg viewBox="0 0 260 110" className="w-full h-full">
+              <defs>
+                <linearGradient id="client-retention" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor="#6fb8ff" />
+                  <stop offset="100%" stopColor="#3de7af" />
+                </linearGradient>
+              </defs>
+              <motion.path d={retentionPath} fill="none" stroke="url(#client-retention)" strokeWidth="4" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.9 }} />
+              {retentionCurve.map((value, index) => {
+                const x = (index / (retentionCurve.length - 1)) * 260
+                const y = 110 - (value / 100) * 110
+                return <circle key={`${value}-${index}`} cx={x} cy={y} r="3.4" fill="#6fb8ff" className="pulse-soft" />
+              })}
+            </svg>
+          </div>
+        </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Risco de churn por carteira</p>
+          <div className="metal-card-plot h-44 p-3 grid grid-cols-4 gap-2">
+            {[2, 3, 4, 1, 1, 2, 3, 4, 5, 2, 1, 3, 2, 4, 1, 2].map((risk, index) => (
+              <motion.div
+                key={`${risk}-${index}`}
+                className="rounded-md border border-[rgba(120,147,196,0.2)]"
+                initial={{ opacity: 0, scale: 0.88 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.015 }}
+                style={{
+                  background: risk >= 4
+                    ? 'rgba(255,107,122,0.68)'
+                    : risk >= 3
+                    ? 'rgba(255,179,71,0.58)'
+                    : 'rgba(39,216,255,0.34)',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3">
+        {filteredClients.map((client) => (
+          <div key={client.id} className="metal-card p-4 md:p-5">
+            <div className="flex flex-wrap justify-between items-center gap-3">
+              <div>
+                <p className="font-semibold text-lg">{client.name}</p>
+                <p className="text-xs text-[var(--admin-text-muted)]">{client.segment} | {client.contact_person}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-[var(--admin-text-muted)]">Contrato</p>
+                <p className="text-sm text-[var(--admin-green)] font-semibold">{client.contract_value}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -1109,35 +1371,137 @@ function BusinessManagementTab({ workOrders, employees }: { workOrders: WorkOrde
 }
 
 function QuotesTab() {
+  const approved = MOCK_QUOTES.filter((quote) => quote.status === 'approved').length
+  const pending = MOCK_QUOTES.filter((quote) => quote.status === 'pending').length
+  const draft = MOCK_QUOTES.filter((quote) => quote.status === 'draft').length
+  const rejected = MOCK_QUOTES.filter((quote) => quote.status === 'rejected').length
+  const pipelineValue = MOCK_QUOTES.reduce((acc, quote) => {
+    const normalized = quote.value.replace(/[^\d,]/g, '').replace(/\./g, '').replace(',', '.')
+    return acc + (Number.parseFloat(normalized) || 0)
+  }, 0)
+  const conversion = Math.round((approved / Math.max(1, approved + rejected)) * 100)
+  const stageLayers = [pending + draft + approved + 1, pending + approved + 1, approved + 1, rejected + 1]
+  const maxLayer = Math.max(...stageLayers, 1)
+  const conversionTrend = [28, 34, 30, 41, 47, 45, 53]
+  const conversionPath = conversionTrend
+    .map((value, index) => {
+      const x = (index / (conversionTrend.length - 1)) * 280
+      const y = 112 - (value / 100) * 112
+      return `${index === 0 ? 'M' : 'L'} ${x},${y}`
+    })
+    .join(' ')
+
   return (
-    <div className="metal-card overflow-hidden">
-      <div className="p-4 border-b border-[rgba(120,147,196,0.2)] flex items-center justify-between">
-        <h3 className="text-sm font-semibold flex items-center gap-2"><Layers className="w-4 h-4 text-[var(--admin-cyan)]" />Pipeline Comercial</h3>
-        <button className="px-3 py-2 rounded-lg text-xs bg-[rgba(39,216,255,0.16)] border border-[rgba(39,216,255,0.44)]">Nova Proposta</button>
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {[
+          { label: 'Pipeline financeiro', value: `R$ ${Math.round(pipelineValue).toLocaleString('pt-BR')}`, tone: 'var(--admin-cyan)' },
+          { label: 'Conversão fechada', value: `${conversion}%`, tone: 'var(--admin-green)' },
+          { label: 'Pendentes de decisão', value: pending, tone: 'var(--admin-amber)' },
+          { label: 'Rejeitados', value: rejected, tone: 'var(--admin-red)' },
+        ].map((metric, index) => (
+          <motion.div key={metric.label} className="metal-card p-5" variants={cardEnter} initial="hidden" animate="show" custom={index}>
+            <div className="metal-shine" />
+            <p className="kpi-label">{metric.label}</p>
+            <p className="kpi-value mt-2" style={{ color: metric.tone }}>{metric.value}</p>
+          </motion.div>
+        ))}
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
-          <thead className="text-[10px] uppercase tracking-widest text-[var(--admin-text-muted)] border-b border-[rgba(120,147,196,0.2)]">
-            <tr>
-              <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">Cliente</th>
-              <th className="px-4 py-3">Serviço</th>
-              <th className="px-4 py-3">Valor</th>
-              <th className="px-4 py-3">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {MOCK_QUOTES.map((quote) => (
-              <tr key={quote.id} className="border-b border-[rgba(120,147,196,0.15)] last:border-b-0 hover:bg-[rgba(39,216,255,0.06)]">
-                <td className="px-4 py-3 text-xs text-[var(--admin-cyan)] font-semibold">{quote.id}</td>
-                <td className="px-4 py-3">{quote.client_name}</td>
-                <td className="px-4 py-3 text-[var(--admin-text-muted)]">{quote.service_type}</td>
-                <td className="px-4 py-3">{quote.value}</td>
-                <td className="px-4 py-3"><span className="text-[10px] uppercase px-2 py-1 rounded-full border border-[rgba(120,147,196,0.3)]">{quote.status}</span></td>
-              </tr>
+
+      <div className="grid xl:grid-cols-3 gap-4">
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Funil comercial em camadas 3D</p>
+          <div className="metal-card-plot h-44 p-4 flex flex-col justify-center gap-3">
+            {stageLayers.map((layer, index) => (
+              <motion.div
+                key={`${layer}-${index}`}
+                className="h-6 rounded-md"
+                initial={{ width: '10%', opacity: 0 }}
+                animate={{ width: `${Math.max(28, (layer / maxLayer) * 95)}%`, opacity: 1 }}
+                transition={{ delay: index * 0.09 }}
+                style={{
+                  background: index === 0
+                    ? 'linear-gradient(90deg, rgba(39,216,255,0.95), rgba(111,184,255,0.88))'
+                    : index === 1
+                    ? 'linear-gradient(90deg, rgba(61,231,175,0.92), rgba(39,216,255,0.76))'
+                    : index === 2
+                    ? 'linear-gradient(90deg, rgba(255,179,71,0.92), rgba(255,130,73,0.84))'
+                    : 'linear-gradient(90deg, rgba(255,107,122,0.9), rgba(167,62,73,0.9))',
+                  boxShadow: '0 8px 18px rgba(0,0,0,0.35)',
+                }}
+              />
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Conversão semanal</p>
+          <div className="metal-card-plot h-44 p-4">
+            <svg viewBox="0 0 280 112" className="w-full h-full">
+              <defs>
+                <linearGradient id="quotes-conversion" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor="#6fb8ff" />
+                  <stop offset="100%" stopColor="#3de7af" />
+                </linearGradient>
+              </defs>
+              <motion.path d={conversionPath} fill="none" stroke="url(#quotes-conversion)" strokeWidth="4" strokeLinecap="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1 }} />
+              {conversionTrend.map((value, index) => {
+                const x = (index / (conversionTrend.length - 1)) * 280
+                const y = 112 - (value / 100) * 112
+                return <circle key={`${value}-${index}`} cx={x} cy={y} r="3.6" fill="#6fb8ff" className="pulse-soft" />
+              })}
+            </svg>
+          </div>
+        </div>
+
+        <div className="metal-card p-5">
+          <p className="kpi-label mb-4">Velocidade de fechamento</p>
+          <div className="metal-card-plot h-44 p-4 flex items-center justify-center">
+            <div className="relative w-36 h-36">
+              <div
+                className="absolute inset-0 rounded-full rotate-slow"
+                style={{ background: `conic-gradient(#3de7af 0deg ${conversion * 3.6}deg, rgba(120,147,196,0.2) ${conversion * 3.6}deg 360deg)` }}
+              />
+              <div className="absolute inset-4 rounded-full bg-[var(--admin-bg)] border border-[rgba(120,147,196,0.3)] grid place-items-center">
+                <div className="text-center">
+                  <p className="kpi-value leading-none">{conversion}%</p>
+                  <p className="text-[10px] text-[var(--admin-text-muted)] uppercase">Taxa de ganho</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="metal-card overflow-hidden">
+        <div className="p-4 border-b border-[rgba(120,147,196,0.2)] flex items-center justify-between">
+          <h3 className="text-sm font-semibold flex items-center gap-2"><Layers className="w-4 h-4 text-[var(--admin-cyan)]" />Pipeline Comercial</h3>
+          <button className="px-3 py-2 rounded-lg text-xs bg-[rgba(39,216,255,0.16)] border border-[rgba(39,216,255,0.44)]">Nova Proposta</button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="text-[10px] uppercase tracking-widest text-[var(--admin-text-muted)] border-b border-[rgba(120,147,196,0.2)]">
+              <tr>
+                <th className="px-4 py-3">ID</th>
+                <th className="px-4 py-3">Cliente</th>
+                <th className="px-4 py-3">Serviço</th>
+                <th className="px-4 py-3">Valor</th>
+                <th className="px-4 py-3">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MOCK_QUOTES.map((quote) => (
+                <tr key={quote.id} className="border-b border-[rgba(120,147,196,0.15)] last:border-b-0 hover:bg-[rgba(39,216,255,0.06)]">
+                  <td className="px-4 py-3 text-xs text-[var(--admin-cyan)] font-semibold">{quote.id}</td>
+                  <td className="px-4 py-3">{quote.client_name}</td>
+                  <td className="px-4 py-3 text-[var(--admin-text-muted)]">{quote.service_type}</td>
+                  <td className="px-4 py-3">{quote.value}</td>
+                  <td className="px-4 py-3"><span className="text-[10px] uppercase px-2 py-1 rounded-full border border-[rgba(120,147,196,0.3)]">{quote.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   )

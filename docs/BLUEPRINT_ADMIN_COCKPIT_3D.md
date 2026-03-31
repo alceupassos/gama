@@ -51,6 +51,11 @@ Criar um cockpit executivo para dono e administradores com leitura imediata de s
 - Risco crítico ativo
 - Retenção/NPS
 
+## Objetivo Micro SaaS (controle de funcionários)
+- Tornar visível o controle diário de execução da equipe para reduzir percepção de falta de gestão.
+- Unificar visão de OS + produtividade de funcionários + qualidade por cliente em uma única jornada.
+- Exibir gargalos de alocação, disciplina e avanço em tempo real para decisão rápida do dono.
+
 ## Fases de Implementação
 1. Foundation
 - Revisar variáveis de tema do admin para suportar claro/escuro/sistema.
@@ -69,9 +74,16 @@ Criar um cockpit executivo para dono e administradores com leitura imediata de s
 - Rodar lint/build.
 - Rodar preview para QA visual.
 
+5. Expansão por menu operacional
+- Ordens de Serviço: backlog 3D, ritmo diário e disciplina de execução.
+- Equipe: matriz de presença, produtividade 3D por técnico e governança de pontualidade.
+- Clientes: distribuição por segmento, retenção e risco de churn em grade.
+- Orçamentos: funil comercial 3D, conversão semanal e velocidade de fechamento.
+
 ## Critérios de Aceite
 - Toggle de tema funcionando no admin (claro/escuro/sistema)
 - Item "Cockpit do Dono" visível e operacional
 - Gestão do negócio com janela 7/30/90 dias
+- Menus OS, Equipe, Clientes e Orçamentos com gráficos 3D animados e leitura executiva
 - Todos os gráficos com animação e aparência grade/metálica
 - Sem erros de lint/build
