@@ -1,0 +1,40 @@
+<svg width="900" height="620" viewBox="0 0 900 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="100" y1="40" x2="760" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B1F44"/>
+      <stop offset="1" stop-color="#0C3B6E"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#1ED4FF" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#8AE6FF" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="620" rx="36" fill="url(#bg)"/>
+  <rect x="22" y="22" width="856" height="576" rx="30" stroke="#5AB7DE" stroke-opacity="0.25"/>
+  <path d="M80 560V250L190 175L300 250V560" fill="#123E70"/>
+  <path d="M320 560V165L450 90L580 165V560" fill="#145385"/>
+  <path d="M600 560V220L700 160L800 220V560" fill="#123E70"/>
+  <g opacity="0.8">
+    <rect x="105" y="280" width="24" height="30" rx="4" fill="#8BE4FF"/>
+    <rect x="145" y="280" width="24" height="30" rx="4" fill="#8BE4FF"/>
+    <rect x="185" y="280" width="24" height="30" rx="4" fill="#8BE4FF"/>
+    <rect x="225" y="280" width="24" height="30" rx="4" fill="#8BE4FF"/>
+    <rect x="105" y="330" width="24" height="30" rx="4" fill="#8BE4FF"/>
+    <rect x="145" y="330" width="24" height="30" rx="4" fill="#8BE4FF"/>
+    <rect x="185" y="330" width="24" height="30" rx="4" fill="#8BE4FF"/>
+    <rect x="225" y="330" width="24" height="30" rx="4" fill="#8BE4FF"/>
+  </g>
+  <g opacity="0.9">
+    <rect x="360" y="140" width="30" height="34" rx="4" fill="#9BE9FF"/>
+    <rect x="410" y="140" width="30" height="34" rx="4" fill="#9BE9FF"/>
+    <rect x="460" y="140" width="30" height="34" rx="4" fill="#9BE9FF"/>
+    <rect x="510" y="140" width="30" height="34" rx="4" fill="#9BE9FF"/>
+    <rect x="360" y="192" width="30" height="34" rx="4" fill="#9BE9FF"/>
+    <rect x="410" y="192" width="30" height="34" rx="4" fill="#9BE9FF"/>
+    <rect x="460" y="192" width="30" height="34" rx="4" fill="#9BE9FF"/>
+    <rect x="510" y="192" width="30" height="34" rx="4" fill="#9BE9FF"/>
+  </g>
+  <rect x="78" y="430" width="744" height="130" rx="20" fill="url(#glass)" stroke="#8BE4FF" stroke-opacity="0.35"/>
+  <text x="110" y="485" fill="#DFF6FF" font-family="Arial" font-size="38" font-weight="700">Condominios comerciais e residenciais</text>
+  <text x="110" y="530" fill="#9EC2DA" font-family="Arial" font-size="24">Operacao 24/7 com manutencao preventiva e corretiva</text>
+</svg>

@@ -6,9 +6,15 @@ import { motion, type Variants } from 'framer-motion'
 import {
   ArrowRight,
   Building2,
-  CircleCheckBig,
+  CheckCircle2,
+  ChevronRight,
   Clock3,
+  Factory,
+  Gauge,
+  HardHat,
   Headset,
+  Mail,
+  Phone,
   ShieldCheck,
   Sparkles,
   UserRound,
@@ -18,18 +24,32 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 import { WhatsAppButton } from '@/components/shared/WhatsAppButton'
 
 const reveal: Variants = {
-  hidden: { opacity: 0, y: 22 },
+  hidden: { opacity: 0, y: 26 },
   show: (index: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: index * 0.08, duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+    transition: { delay: index * 0.08, duration: 0.62, ease: [0.22, 1, 0.36, 1] },
   }),
 }
 
+const sections = [
+  { id: 'quem-somos', label: 'Quem somos' },
+  { id: 'segmentos', label: 'Segmentos' },
+  { id: 'servicos', label: 'Servicos' },
+  { id: 'orcamento-inteligente', label: 'Orcamento automatico' },
+  { id: 'contato', label: 'Contato' },
+]
+
 export default function HomePage() {
   return (
-    <div className="landing-shell relative min-h-screen">
+    <div className="landing-shell relative min-h-screen overflow-x-hidden">
       <div className="landing-grid-overlay pointer-events-none fixed inset-0 opacity-35" />
+
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
+        <div className="absolute top-1/3 -right-20 h-72 w-72 rounded-full bg-sky-300/15 blur-3xl" />
+        <div className="absolute bottom-6 left-1/3 h-60 w-60 rounded-full bg-amber-300/10 blur-3xl" />
+      </div>
 
       <header className="sticky top-0 z-50 border-b border-[var(--landing-border)] backdrop-blur-xl bg-[color:var(--landing-glass)]">
         <div className="max-w-7xl mx-auto px-5 md:px-8 h-20 flex items-center justify-between gap-4">
@@ -39,15 +59,16 @@ export default function HomePage() {
             </div>
             <div>
               <p className="font-black tracking-tight leading-none">GAMA SERVICES</p>
-              <p className="text-[10px] tracking-[0.2em] uppercase landing-muted mt-1">Atendimento para clientes</p>
+              <p className="text-[10px] tracking-[0.2em] uppercase landing-muted mt-1">Industrial Excellence</p>
             </div>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-8 text-sm landing-muted">
-            <a href="#solucoes" className="hover:text-[var(--landing-text)] transition-colors">Serviços</a>
-            <a href="#acompanhamento" className="hover:text-[var(--landing-text)] transition-colors">Acompanhamento</a>
-            <a href="#resultado" className="hover:text-[var(--landing-text)] transition-colors">Benefícios</a>
-            <a href="#contato" className="hover:text-[var(--landing-text)] transition-colors">Contato</a>
+          <nav className="hidden xl:flex items-center gap-6 text-sm landing-muted">
+            {sections.map((item) => (
+              <a key={item.id} href={`#${item.id}`} className="hover:text-[var(--landing-text)] transition-colors">
+                {item.label}
+              </a>
+            ))}
           </nav>
 
           <div className="flex items-center gap-2 md:gap-3">
@@ -56,50 +77,55 @@ export default function HomePage() {
               Portal do Cliente
             </Link>
             <Link href="/orcamento" className="px-4 py-2.5 rounded-xl text-xs md:text-sm font-semibold border border-[var(--landing-border)] bg-[color:var(--landing-glass)] hover:border-[var(--landing-accent)] transition-colors">
-              Solicitar Orçamento
+              Solicitar Orcamento
             </Link>
             <Link href="/dashboard/admin" className="hidden xl:inline-flex px-3 py-2 rounded-xl text-xs font-medium border border-transparent landing-muted hover:border-[var(--landing-border)] transition-colors">
-              Área interna
+              Area interna
             </Link>
           </div>
         </div>
       </header>
 
       <main className="relative z-10">
-        <section className="max-w-7xl mx-auto px-5 md:px-8 pt-16 md:pt-20 pb-14 md:pb-20">
+        <section id="inicio" className="max-w-7xl mx-auto px-5 md:px-8 pt-16 md:pt-20 pb-14 md:pb-20">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="space-y-6">
-              <motion.span className="landing-panel inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs" variants={reveal} initial="hidden" animate="show" custom={0}>
-                <CircleCheckBig className="w-3.5 h-3.5 text-[var(--landing-accent)]" /> Manutenção clara, rápida e sem dor de cabeça
-              </motion.span>
+              <motion.div className="flex flex-wrap gap-2" variants={reveal} initial="hidden" animate="show" custom={0}>
+                {['Ar Condicionado', 'Eletrica', 'Hidraulica', 'Facilities'].map((chip) => (
+                  <span key={chip} className="landing-panel inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[var(--landing-accent)]" /> {chip}
+                  </span>
+                ))}
+              </motion.div>
 
-              <motion.h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[0.95]" variants={reveal} initial="hidden" animate="show" custom={1}>
-                Seu prédio
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[var(--landing-accent)] to-[#75BEFF]">funcionando,</span>
-                com suporte de verdade.
+              <motion.h1 className="text-5xl md:text-7xl font-black tracking-tight leading-[0.94]" variants={reveal} initial="hidden" animate="show" custom={1}>
+                Manutencao predial
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[var(--landing-accent)] to-[#75BEFF]">com engenharia</span>
+                de precisao e resposta real.
               </motion.h1>
 
               <motion.p className="text-lg landing-muted max-w-xl" variants={reveal} initial="hidden" animate="show" custom={2}>
-                Solicite serviços, acompanhe status, converse com a equipe e receba atualizações em tempo real no portal do cliente.
+                Reestruturamos a operacao da sua unidade com atendimento 24/7, padrao ABNT e acompanhamento em tempo real para o cliente.
               </motion.p>
 
               <motion.div className="flex flex-wrap gap-3" variants={reveal} initial="hidden" animate="show" custom={3}>
                 <Link href="/orcamento" className="landing-cta px-6 py-3 rounded-2xl font-bold transition-colors inline-flex items-center gap-2">
-                  Solicitar orçamento <ArrowRight className="w-4 h-4" />
+                  Orcamento rapido <ArrowRight className="w-4 h-4" />
                 </Link>
-                <Link href="/dashboard/client" className="landing-panel px-6 py-3 rounded-2xl font-semibold hover:border-[var(--landing-accent)] transition-colors inline-flex items-center gap-2">
-                  <UserRound className="w-4 h-4 text-[var(--landing-accent)]" /> Acompanhar meu chamado
-                </Link>
+                <a href="https://wa.me/551136972127" className="landing-panel px-6 py-3 rounded-2xl font-semibold hover:border-[var(--landing-accent)] transition-colors inline-flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-[var(--landing-accent)]" /> (11) 3697-2127
+                </a>
               </motion.div>
 
-              <motion.div className="grid grid-cols-3 gap-3 pt-2" variants={reveal} initial="hidden" animate="show" custom={4}>
+              <motion.div className="grid sm:grid-cols-4 gap-3 pt-2" variants={reveal} initial="hidden" animate="show" custom={4}>
                 {[
-                  { label: 'SLA de atendimento', value: '99.2%' },
-                  { label: 'Resposta média', value: '23 min' },
+                  { label: 'SLA medio', value: '99.2%' },
+                  { label: 'Resposta', value: '23 min' },
+                  { label: 'Cobertura', value: 'SP Capital' },
                   { label: 'Suporte', value: '24/7' },
                 ].map((item) => (
                   <div key={item.label} className="landing-panel rounded-2xl p-4">
-                    <p className="text-2xl font-extrabold">{item.value}</p>
+                    <p className="text-xl md:text-2xl font-extrabold">{item.value}</p>
                     <p className="text-[11px] uppercase tracking-wider landing-muted mt-1">{item.label}</p>
                   </div>
                 ))}
@@ -107,29 +133,147 @@ export default function HomePage() {
             </div>
 
             <motion.div className="relative" variants={reveal} initial="hidden" animate="show" custom={2}>
-              <div className="absolute -inset-5 rounded-[2rem] bg-[radial-gradient(circle,rgba(39,216,255,0.2),transparent_70%)] blur-2xl" />
-              <div className="landing-panel relative rounded-[2rem] overflow-hidden">
-                <Image src="/images/landing/client-hero.svg" alt="Painel para clientes" width={1200} height={900} className="w-full h-auto" priority />
+              <div className="absolute -inset-6 rounded-[2rem] bg-[radial-gradient(circle,rgba(39,216,255,0.25),transparent_70%)] blur-3xl" />
+
+              <div className="landing-panel relative rounded-[2rem] overflow-hidden mb-4 animate-float">
+                <Image src="/images/landing/client-hero.svg" alt="Painel de atendimento para clientes" width={1200} height={900} className="w-full h-auto" priority />
                 <div className="landing-panel absolute top-5 right-5 rounded-xl px-4 py-3">
                   <p className="text-[10px] uppercase tracking-[0.15em] landing-muted">Chamado ativo</p>
                   <p className="text-xl font-black">Em andamento</p>
                 </div>
-                <div className="landing-panel absolute left-5 bottom-5 rounded-xl px-4 py-3">
-                  <p className="text-[10px] uppercase tracking-[0.15em] landing-muted">Próxima visita</p>
-                  <p className="text-xl font-black text-[var(--landing-accent)]">Hoje 14:30</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="landing-panel rounded-2xl overflow-hidden animate-float-delayed">
+                  <Image src="/images/landing/service-facilities.svg" alt="Gerenciamento de facilities" width={900} height={560} className="w-full h-auto" />
+                </div>
+                <div className="landing-panel rounded-2xl overflow-hidden animate-float">
+                  <Image src="/images/landing/quote-flow.svg" alt="Fluxo de orcamento automatico" width={900} height={560} className="w-full h-auto" />
                 </div>
               </div>
             </motion.div>
           </div>
         </section>
 
-        <section id="solucoes" className="max-w-7xl mx-auto px-5 md:px-8 pb-14 md:pb-20">
-          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <section id="quem-somos" className="max-w-7xl mx-auto px-5 md:px-8 pb-14 md:pb-20">
+          <div className="grid lg:grid-cols-2 gap-6 items-stretch">
+            <motion.article className="landing-panel rounded-[2rem] p-7 md:p-9" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={0}>
+              <p className="text-xs uppercase tracking-[0.2em] landing-muted">Quem somos</p>
+              <h2 className="text-3xl md:text-4xl font-black mt-3">Solucao integrada para manutencoes prediais e comerciais em Sao Paulo.</h2>
+              <p className="landing-muted mt-4 leading-relaxed">
+                A GAMA SERVICES e especializada em ar condicionado e facilities. Nossa equipe tecnica atua dentro de padroes ABNT e integra
+                servicos complementares para entregar a operacao completa com eficiencia e qualidade.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3 mt-6">
+                {[
+                  'Manutencao preventiva e corretiva',
+                  'Equipe tecnica capacitada',
+                  'Padrao ABNT em execucao',
+                  'Gestao central de fornecedores e chamados',
+                ].map((item) => (
+                  <div key={item} className="landing-panel rounded-xl px-3 py-2 text-sm inline-flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-[var(--landing-accent)]" /> {item}
+                  </div>
+                ))}
+              </div>
+            </motion.article>
+
+            <motion.div className="landing-panel rounded-[2rem] overflow-hidden" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={1}>
+              <Image src="/images/landing/client-support.svg" alt="Equipe acompanhando atendimento e suporte" width={800} height={560} className="w-full h-full object-cover" />
+            </motion.div>
+          </div>
+        </section>
+
+        <section id="segmentos" className="max-w-7xl mx-auto px-5 md:px-8 pb-14 md:pb-20">
+          <motion.div className="mb-6" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={0}>
+            <p className="text-xs uppercase tracking-[0.2em] landing-muted">Segmentos</p>
+            <h2 className="text-3xl md:text-4xl font-black mt-2">Atendimento em multiplos perfis de operacao</h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-5">
             {[
-              { title: 'Ar Condicionado', icon: Wrench, text: 'Instalação, preventiva e corretiva para conforto e eficiência.' },
-              { title: 'Elétrica', icon: ShieldCheck, text: 'Correções seguras e manutenção de quadros e circuitos.' },
-              { title: 'Hidráulica e Predial', icon: Building2, text: 'Vazamentos, bombas, ajustes e manutenção geral do imóvel.' },
-              { title: 'Suporte Humanizado', icon: Headset, text: 'Canal direto para acompanhar cada etapa do atendimento.' },
+              {
+                title: 'Condominios comerciais e residenciais',
+                text: 'Rotina de manutencao recorrente, controle de SLAs e atendimento rapido para demandas criticas.',
+                image: '/images/landing/segment-condominios.svg',
+                icon: Building2,
+              },
+              {
+                title: 'Operacoes corporativas',
+                text: 'Suporte para predios administrativos, lojas e unidades de atendimento com rastreabilidade completa.',
+                image: '/images/landing/segment-corporativo.svg',
+                icon: Gauge,
+              },
+              {
+                title: 'Ambientes industriais',
+                text: 'Padroes tecnicos para ativos criticos, continuidade operacional e seguranca de planta.',
+                image: '/images/landing/segment-industrial.svg',
+                icon: Factory,
+              },
+            ].map((item, idx) => {
+              const Icon = item.icon
+              return (
+                <motion.article
+                  key={item.title}
+                  className="landing-panel rounded-3xl overflow-hidden"
+                  variants={reveal}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.15 }}
+                  custom={idx}
+                >
+                  <Image src={item.image} alt={item.title} width={900} height={620} className="w-full h-auto" />
+                  <div className="p-5">
+                    <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] landing-muted">
+                      <Icon className="w-4 h-4 text-[var(--landing-accent)]" /> Segmento
+                    </p>
+                    <h3 className="font-black text-xl mt-2">{item.title}</h3>
+                    <p className="landing-muted text-sm mt-2">{item.text}</p>
+                  </div>
+                </motion.article>
+              )
+            })}
+          </div>
+        </section>
+
+        <section id="servicos" className="max-w-7xl mx-auto px-5 md:px-8 pb-14 md:pb-20">
+          <motion.div className="mb-6" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={0}>
+            <p className="text-xs uppercase tracking-[0.2em] landing-muted">Servicos</p>
+            <h2 className="text-3xl md:text-4xl font-black mt-2">Escopo completo que reintegra o conteudo principal do site oficial</h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {[
+              {
+                title: 'Ar Condicionado',
+                text: 'Instalacao, manutencao preventiva e corretiva com foco em performance termica e economia.',
+                icon: Wrench,
+              },
+              {
+                title: 'Eletrica',
+                text: 'Diagnostico, adequacoes e manutencao de quadros, circuitos, iluminacao e seguranca eletrica.',
+                icon: ShieldCheck,
+              },
+              {
+                title: 'Hidraulica',
+                text: 'Correcao de vazamentos, bombas, pressao, esgoto e manutencao geral da infraestrutura hidraulica.',
+                icon: HardHat,
+              },
+              {
+                title: 'Civil e Pintura',
+                text: 'Reparos civis, acabamento e pintura geral para preservacao da unidade e imagem do espaco.',
+                icon: Building2,
+              },
+              {
+                title: 'Gerenciamento de Facilities',
+                text: 'Eletrica, hidraulica, civil e pintura sob uma unica orquestracao operacional.',
+                icon: Headset,
+              },
+              {
+                title: 'Edificacoes e Obras Rapidas',
+                text: 'Intervencoes curtas com escopo definido, prazo enxuto e acompanhamento ativo por protocolo.',
+                icon: Gauge,
+              },
             ].map((item, idx) => {
               const Icon = item.icon
               return (
@@ -145,57 +289,89 @@ export default function HomePage() {
           </div>
         </section>
 
+        <section id="orcamento-inteligente" className="max-w-7xl mx-auto px-5 md:px-8 pb-14 md:pb-20">
+          <div className="grid lg:grid-cols-2 gap-6 items-stretch">
+            <motion.article className="landing-panel rounded-[2rem] p-7 md:p-9" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={0}>
+              <p className="text-xs uppercase tracking-[0.2em] landing-muted">Orcamento rapido</p>
+              <h2 className="text-3xl md:text-4xl font-black mt-2">Fluxo automatico para o cliente montar o escopo e receber estimativa.</h2>
+              <div className="mt-6 space-y-3">
+                {[
+                  '1. Diagnostico inicial do tipo de servico',
+                  '2. Escopo com area, urgencia e adicionais',
+                  '3. Simulacao de faixa de valor em tempo real',
+                  '4. Envio com protocolo e contato automatizado',
+                ].map((step) => (
+                  <div key={step} className="landing-panel rounded-xl px-4 py-3 text-sm inline-flex items-center gap-2 w-full">
+                    <ChevronRight className="w-4 h-4 text-[var(--landing-accent)]" /> {step}
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-3 mt-7">
+                <Link href="/orcamento" className="landing-cta px-5 py-3 rounded-xl font-bold inline-flex items-center gap-2 transition-colors">
+                  Abrir orcamento automatico <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link href="/dashboard/client" className="landing-panel px-5 py-3 rounded-xl font-semibold hover:border-[var(--landing-accent)] transition-colors inline-flex items-center gap-2">
+                  <UserRound className="w-4 h-4 text-[var(--landing-accent)]" /> Acompanhar meu chamado
+                </Link>
+              </div>
+            </motion.article>
+
+            <motion.div className="landing-panel rounded-[2rem] overflow-hidden" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={1}>
+              <Image src="/images/landing/quote-flow.svg" alt="Fluxo de orcamento em 4 etapas" width={900} height={560} className="w-full h-full object-cover" />
+            </motion.div>
+          </div>
+        </section>
+
         <section id="acompanhamento" className="max-w-7xl mx-auto px-5 md:px-8 pb-14 md:pb-20 grid lg:grid-cols-2 gap-6">
           <motion.div className="landing-panel rounded-[2rem] overflow-hidden" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={0}>
-            <Image src="/images/landing/client-support.svg" alt="Acompanhamento de suporte" width={800} height={560} className="w-full h-auto" />
+            <Image src="/images/landing/client-support.svg" alt="Acompanhamento de suporte em tempo real" width={800} height={560} className="w-full h-auto" />
           </motion.div>
 
           <motion.div className="landing-panel rounded-[2rem] overflow-hidden" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={1}>
-            <Image src="/images/landing/client-service.svg" alt="Serviço em execução" width={800} height={560} className="w-full h-auto" />
-          </motion.div>
-        </section>
-
-        <section id="resultado" className="max-w-7xl mx-auto px-5 md:px-8 pb-16 md:pb-24">
-          <motion.div className="landing-panel rounded-[2rem] p-8 md:p-10" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={0}>
-            <p className="text-xs uppercase tracking-[0.2em] landing-muted">Vantagens para o cliente</p>
-            <h2 className="text-3xl md:text-4xl font-black mt-3 max-w-3xl">Mais previsibilidade, menos estresse e atendimento transparente do início ao fim.</h2>
-            <div className="grid md:grid-cols-3 gap-4 mt-7">
-              {[
-                { label: 'Atualizações em tempo real', value: '100%' },
-                { label: 'Confiabilidade de agenda', value: '98%' },
-                { label: 'Satisfação média', value: '4.9/5' },
-              ].map((item) => (
-                <div key={item.label} className="landing-panel rounded-2xl p-5">
-                  <p className="text-3xl font-black text-[var(--landing-accent)]">{item.value}</p>
-                  <p className="text-sm landing-muted mt-2">{item.label}</p>
-                </div>
-              ))}
-            </div>
+            <Image src="/images/landing/client-service.svg" alt="Servico em execucao com equipe tecnica" width={800} height={560} className="w-full h-auto" />
           </motion.div>
         </section>
 
         <section id="contato" className="max-w-7xl mx-auto px-5 md:px-8 pb-20">
-          <div className="landing-panel rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] landing-muted">Precisa de atendimento?</p>
-              <h3 className="text-2xl md:text-3xl font-black mt-2">Fale com a equipe e receba retorno rápido.</h3>
+          <motion.div className="landing-panel rounded-[2rem] p-6 md:p-8" variants={reveal} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} custom={0}>
+            <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] landing-muted">Contato oficial</p>
+                <h3 className="text-2xl md:text-3xl font-black mt-2">Canal direto para solicitacoes, duvidas e propostas.</h3>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <a href="https://wa.me/551136972127" className="landing-cta px-5 py-3 rounded-xl font-bold inline-flex items-center gap-2 transition-colors">
+                  WhatsApp <ArrowRight className="w-4 h-4" />
+                </a>
+                <Link href="/orcamento" className="landing-panel px-5 py-3 rounded-xl font-semibold hover:border-[var(--landing-accent)] transition-colors">
+                  Solicitar orcamento
+                </Link>
+              </div>
             </div>
-            <div className="flex gap-3">
-              <a href="https://wa.me/5511999999999" className="landing-cta px-5 py-3 rounded-xl font-bold inline-flex items-center gap-2 transition-colors">
-                WhatsApp <ArrowRight className="w-4 h-4" />
-              </a>
-              <Link href="/orcamento" className="landing-panel px-5 py-3 rounded-xl font-semibold hover:border-[var(--landing-accent)] transition-colors">
-                Abrir orçamento
-              </Link>
+
+            <div className="grid md:grid-cols-3 gap-4 mt-6">
+              <div className="landing-panel rounded-xl p-4">
+                <p className="text-xs uppercase tracking-[0.14em] landing-muted">Telefone e WhatsApp</p>
+                <p className="text-xl font-black mt-1 inline-flex items-center gap-2"><Phone className="w-4 h-4 text-[var(--landing-accent)]" /> (11) 3697-2127</p>
+              </div>
+              <div className="landing-panel rounded-xl p-4">
+                <p className="text-xs uppercase tracking-[0.14em] landing-muted">E-mail</p>
+                <p className="text-xl font-black mt-1 inline-flex items-center gap-2"><Mail className="w-4 h-4 text-[var(--landing-accent)]" /> contato@gamaservices.com.br</p>
+              </div>
+              <div className="landing-panel rounded-xl p-4">
+                <p className="text-xs uppercase tracking-[0.14em] landing-muted">Atendimento</p>
+                <p className="text-xl font-black mt-1 inline-flex items-center gap-2"><Clock3 className="w-4 h-4 text-[var(--landing-accent)]" /> 24/7 para contratos ativos</p>
+              </div>
             </div>
-          </div>
+          </motion.div>
         </section>
       </main>
 
       <footer className="border-t border-[var(--landing-border)] py-8 text-center text-xs landing-muted">
         <div className="max-w-7xl mx-auto px-5 md:px-8 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p>GAMA Services © {new Date().getFullYear()} | Atendimento de manutenção para clientes</p>
-          <p className="inline-flex items-center gap-2"><Clock3 className="w-3.5 h-3.5" /> Atendimento 24/7 para contratos ativos</p>
+          <p>GAMA Services © {new Date().getFullYear()} | Manutencao predial e comercial em Sao Paulo</p>
+          <p className="inline-flex items-center gap-2"><Headset className="w-3.5 h-3.5" /> Conteudo reinserido e melhorado com foco em conversao</p>
         </div>
       </footer>
 

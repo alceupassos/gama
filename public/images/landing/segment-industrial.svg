@@ -1,0 +1,27 @@
+<svg width="900" height="620" viewBox="0 0 900 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg3" x1="40" y1="40" x2="840" y2="560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#09172C"/>
+      <stop offset="1" stop-color="#0F3A61"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#29D7FF" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#2AE0A5" stop-opacity="0.55"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="620" rx="36" fill="url(#bg3)"/>
+  <rect x="24" y="24" width="852" height="572" rx="28" stroke="#7ACAE8" stroke-opacity="0.24"/>
+  <path d="M66 520H834" stroke="#6AB4D8" stroke-opacity="0.2" stroke-width="2"/>
+  <path d="M120 520V280L220 210L320 280V520" fill="#13416D"/>
+  <path d="M340 520V240L440 180L540 240V520" fill="#165684"/>
+  <path d="M560 520V300L640 252L720 300V520" fill="#13416D"/>
+  <rect x="360" y="112" width="160" height="40" rx="8" fill="#0E2845" stroke="#84D9F2" stroke-opacity="0.35"/>
+  <text x="385" y="139" fill="#CBF2FF" font-family="Arial" font-size="18" font-weight="700">PLANTA ATIVA</text>
+  <path d="M130 390C190 350 255 360 310 312C370 260 436 306 500 274C560 244 624 292 700 255" stroke="url(#line)" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="130" cy="390" r="7" fill="#2AD6FF"/>
+  <circle cx="310" cy="312" r="7" fill="#2AD6FF"/>
+  <circle cx="500" cy="274" r="7" fill="#2AD6FF"/>
+  <circle cx="700" cy="255" r="7" fill="#2AD6FF"/>
+  <rect x="78" y="544" width="744" height="52" rx="14" fill="#102A49" stroke="#76C2E8" stroke-opacity="0.3"/>
+  <text x="106" y="578" fill="#E2F6FF" font-family="Arial" font-size="28" font-weight="700">Industrial: monitoramento tecnico de ativos criticos</text>
+</svg>
