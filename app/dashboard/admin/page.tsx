@@ -91,11 +91,11 @@ function getQuoteStatusBadge(status: typeof MOCK_QUOTES[number]['status']) {
 function getClientStatusBadge(status: Client['status']) {
   switch (status) {
     case 'active':
-      return { label: 'Ativo', border: 'rgba(61,231,175,0.55)', bg: 'rgba(61,231,175,0.2)' }
+      return { label: 'Ativo', text: '#ffffff', border: 'rgba(20,138,98,0.85)', bg: '#1ea978' }
     case 'inactive':
-      return { label: 'Inativo', border: 'rgba(255,107,122,0.58)', bg: 'rgba(255,107,122,0.2)' }
+      return { label: 'Inativo', text: '#ffffff', border: 'rgba(176,59,72,0.85)', bg: '#d35364' }
     default:
-      return { label: 'Indefinido', border: 'rgba(120,147,196,0.4)', bg: 'rgba(120,147,196,0.14)' }
+      return { label: 'Indefinido', text: '#ffffff', border: 'rgba(77,98,131,0.75)', bg: '#4d6283' }
   }
 }
 
@@ -408,7 +408,7 @@ export default function AdminDashboard() {
               <div className="relative">
                 <button
                   onClick={() => setIsBranchMenuOpen((prev) => !prev)}
-                  className="flex items-center gap-2 px-3 py-2 text-xs rounded-lg border border-[rgba(120,147,196,0.36)] bg-[rgba(11,18,32,0.8)] hover:border-[rgba(39,216,255,0.55)] transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-xs rounded-lg border border-[rgba(120,147,196,0.36)] bg-[color:var(--admin-panel-soft)] text-[var(--admin-text)] hover:border-[rgba(39,216,255,0.55)] transition-colors"
                 >
                   <Building2 className="w-3.5 h-3.5 text-[var(--admin-cyan)]" />
                   <span>{currentBranchName}</span>
@@ -1187,8 +1187,8 @@ function ClientsTab({ branchId }: { branchId: string }) {
                   </div>
                   <div className="flex items-center gap-3">
                     <span
-                      className="text-[10px] uppercase font-semibold tracking-wide px-2.5 py-1 rounded-full border text-[var(--admin-text)]"
-                      style={{ borderColor: clientBadge.border, background: clientBadge.bg }}
+                      className="text-[10px] uppercase font-semibold tracking-wide px-2.5 py-1 rounded-full border"
+                      style={{ color: clientBadge.text, borderColor: clientBadge.border, background: clientBadge.bg }}
                     >
                       {clientBadge.label}
                     </span>
