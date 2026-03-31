@@ -1,0 +1,44 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#081122"/>
+      <stop offset="1" stop-color="#152847"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="950" y1="90" x2="350" y2="780" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2AD6FF" stop-opacity="0.7"/>
+      <stop offset="1" stop-color="#2AD6FF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="900" rx="32" fill="url(#bg)"/>
+  <g opacity="0.25">
+    <path d="M0 80H1200" stroke="#7C93C4"/>
+    <path d="M0 160H1200" stroke="#7C93C4"/>
+    <path d="M0 240H1200" stroke="#7C93C4"/>
+    <path d="M0 320H1200" stroke="#7C93C4"/>
+    <path d="M0 400H1200" stroke="#7C93C4"/>
+    <path d="M0 480H1200" stroke="#7C93C4"/>
+    <path d="M0 560H1200" stroke="#7C93C4"/>
+    <path d="M0 640H1200" stroke="#7C93C4"/>
+    <path d="M0 720H1200" stroke="#7C93C4"/>
+    <path d="M80 0V900" stroke="#7C93C4"/>
+    <path d="M160 0V900" stroke="#7C93C4"/>
+    <path d="M240 0V900" stroke="#7C93C4"/>
+    <path d="M320 0V900" stroke="#7C93C4"/>
+    <path d="M400 0V900" stroke="#7C93C4"/>
+    <path d="M480 0V900" stroke="#7C93C4"/>
+    <path d="M560 0V900" stroke="#7C93C4"/>
+    <path d="M640 0V900" stroke="#7C93C4"/>
+    <path d="M720 0V900" stroke="#7C93C4"/>
+    <path d="M800 0V900" stroke="#7C93C4"/>
+    <path d="M880 0V900" stroke="#7C93C4"/>
+    <path d="M960 0V900" stroke="#7C93C4"/>
+    <path d="M1040 0V900" stroke="#7C93C4"/>
+    <path d="M1120 0V900" stroke="#7C93C4"/>
+  </g>
+  <rect x="76" y="82" width="500" height="250" rx="24" fill="#0E1B33" stroke="#2AD6FF" stroke-opacity="0.35"/>
+  <rect x="624" y="122" width="500" height="656" rx="26" fill="#0D1A2F" stroke="#2AD6FF" stroke-opacity="0.28"/>
+  <rect x="670" y="190" width="410" height="140" rx="18" fill="#172A49"/>
+  <rect x="670" y="360" width="410" height="140" rx="18" fill="#172A49"/>
+  <rect x="670" y="530" width="410" height="140" rx="18" fill="#172A49"/>
+  <circle cx="955" cy="250" r="200" fill="url(#glow)"/>
+</svg>

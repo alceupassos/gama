@@ -243,6 +243,63 @@ body {
   mask-image: radial-gradient(circle at center, black, transparent 80%);
 }
 
+/* Landing V2 - Theme aware */
+:root {
+  --landing-bg-main: radial-gradient(circle at 15% 0%, rgba(39, 216, 255, 0.16), transparent 42%),
+    radial-gradient(circle at 90% 5%, rgba(255, 179, 71, 0.14), transparent 34%),
+    linear-gradient(180deg, #ecf7ff, #e9f2ff 40%, #dde9f8);
+  --landing-grid-line: rgba(51, 82, 130, 0.16);
+  --landing-text: #0d1b34;
+  --landing-muted: #3b4f71;
+  --landing-border: rgba(62, 96, 147, 0.28);
+  --landing-glass: rgba(248, 252, 255, 0.8);
+  --landing-accent: #099ad6;
+  --landing-accent-strong: #067cb0;
+}
+
+.dark {
+  --landing-bg-main: radial-gradient(circle at 15% 0%, rgba(39, 216, 255, 0.14), transparent 42%),
+    radial-gradient(circle at 90% 5%, rgba(255, 179, 71, 0.14), transparent 34%),
+    linear-gradient(180deg, #03060c, #060e1c 40%, #081327);
+  --landing-grid-line: rgba(124, 147, 196, 0.16);
+  --landing-text: #f1f6ff;
+  --landing-muted: #b2c0db;
+  --landing-border: rgba(124, 147, 196, 0.3);
+  --landing-glass: rgba(8, 15, 29, 0.76);
+  --landing-accent: #2ad6ff;
+  --landing-accent-strong: #52e0ff;
+}
+
+.landing-shell {
+  background: var(--landing-bg-main);
+  color: var(--landing-text);
+}
+
+.landing-grid-overlay {
+  background: linear-gradient(var(--landing-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--landing-grid-line) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+.landing-panel {
+  border: 1px solid var(--landing-border);
+  background: var(--landing-glass);
+  backdrop-filter: blur(10px);
+}
+
+.landing-muted {
+  color: var(--landing-muted);
+}
+
+.landing-cta {
+  background: var(--landing-accent);
+  color: #04101f;
+}
+
+.landing-cta:hover {
+  background: var(--landing-accent-strong);
+}
+
 /* Admin V2 - Industrial Metal Theme */
 :root {
   --admin-bg: #04070d;
