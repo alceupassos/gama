@@ -67,6 +67,7 @@ function SafeAvatar({ src, alt, size = 40 }: { src?: string; alt: string; size?:
         src={avatarSrc}
         alt={alt}
         fill
+        unoptimized
         className="object-cover"
         onError={() => setHasError(true)}
         sizes={`${size}px`}

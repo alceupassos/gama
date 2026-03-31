@@ -98,6 +98,7 @@ export default function EmployeeDashboard() {
                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`} 
                alt="UserAvatar" 
                fill
+               unoptimized
                className="object-cover"
              />
           </div>

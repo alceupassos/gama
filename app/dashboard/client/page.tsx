@@ -171,6 +171,7 @@ export default function ClientDashboard() {
                                   src={tech?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${tech?.full_name}`} 
                                   alt={tech?.full_name || 'Technician'} 
                                   fill
+                                  unoptimized
                                   className="object-cover"
                                 />
                               </div>
