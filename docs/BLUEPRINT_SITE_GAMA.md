@@ -77,3 +77,18 @@
 - [x] Correções de carregamento de avatares SVG remotos.
 - [x] Wizard de orçamento automático com cálculo em tempo real.
 - [x] Blueprint salvo em arquivo no repositório.
+
+## 11) Evidências de validação (31/03/2026)
+- Instalação de dependências: `npm install` (OK)
+- Qualidade estática: `npm run lint` (OK)
+- Build de produção: executado com aviso de lockfiles múltiplos no workspace (sem erro de código)
+- Validação HTTP local (dev server):
+  - `GET /` => `200 OK`
+  - `GET /orcamento` => `200 OK`
+  - `GET /dashboard/admin` => `200 OK`
+  - `GET /images/landing/client-hero.svg` => `200 OK`
+  - `GET /images/landing/client-support.svg` => `200 OK`
+  - `GET /images/landing/client-service.svg` => `200 OK`
+
+## 12) Próximo refinamento recomendado
+- Ajustar `turbopack.root` no `next.config` para remover o warning de múltiplos lockfiles e estabilizar o fluxo de build no monorepo.
