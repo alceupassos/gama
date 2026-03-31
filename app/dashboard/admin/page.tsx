@@ -55,6 +55,38 @@ function AnimatedNumber({ value, prefix = '', suffix = '' }: { value: number; pr
   return <span className="kpi-value">{prefix}{value.toLocaleString('pt-BR')}{suffix}</span>
 }
 
+function getWorkOrderStatusBadge(status: WorkOrder['status']) {
+  switch (status) {
+    case 'in_progress':
+      return { label: 'Em andamento', border: 'rgba(39,216,255,0.55)', bg: 'rgba(39,216,255,0.2)' }
+    case 'done':
+      return { label: 'Concluída', border: 'rgba(61,231,175,0.55)', bg: 'rgba(61,231,175,0.2)' }
+    case 'pending':
+      return { label: 'Pendente', border: 'rgba(255,179,71,0.58)', bg: 'rgba(255,179,71,0.24)' }
+    case 'scheduled':
+      return { label: 'Agendada', border: 'rgba(111,184,255,0.5)', bg: 'rgba(111,184,255,0.2)' }
+    case 'canceled':
+      return { label: 'Cancelada', border: 'rgba(255,107,122,0.58)', bg: 'rgba(255,107,122,0.2)' }
+    default:
+      return { label: 'Indefinida', border: 'rgba(120,147,196,0.4)', bg: 'rgba(120,147,196,0.14)' }
+  }
+}
+
+function getQuoteStatusBadge(status: typeof MOCK_QUOTES[number]['status']) {
+  switch (status) {
+    case 'approved':
+      return { label: 'Aprovado', border: 'rgba(61,231,175,0.55)', bg: 'rgba(61,231,175,0.2)' }
+    case 'pending':
+      return { label: 'Pendente', border: 'rgba(255,179,71,0.58)', bg: 'rgba(255,179,71,0.24)' }
+    case 'draft':
+      return { label: 'Rascunho', border: 'rgba(111,184,255,0.5)', bg: 'rgba(111,184,255,0.2)' }
+    case 'rejected':
+      return { label: 'Recusado', border: 'rgba(255,107,122,0.58)', bg: 'rgba(255,107,122,0.2)' }
+    default:
+      return { label: 'Indefinido', border: 'rgba(120,147,196,0.4)', bg: 'rgba(120,147,196,0.14)' }
+  }
+}
+
 function SafeAvatar({ src, alt, size = 40 }: { src?: string; alt: string; size?: number }) {
   const [hasError, setHasError] = useState(false)
   const avatarSrc = src && !hasError ? src : '/images/avatars/placeholder-user.svg'
@@ -858,6 +890,7 @@ function OSTab({ workOrders }: { workOrders: WorkOrder[] }) {
       <div className="grid gap-3">
         {workOrders.map((os) => {
           const tech = MOCK_EMPLOYEES.find((employee) => employee.id === os.tech_id)
+          const osBadge = getWorkOrderStatusBadge(os.status)
           return (
             <div key={os.id} className="metal-card p-4 md:p-5">
               <div className="flex flex-wrap items-center gap-4 justify-between">
@@ -872,8 +905,11 @@ function OSTab({ workOrders }: { workOrders: WorkOrder[] }) {
                     <p className="text-sm">{tech?.full_name || 'Sem técnico'}</p>
                   </div>
                   <SafeAvatar src={tech?.avatar_url} alt={tech?.full_name || 'Tecnico'} size={34} />
-                  <span className="text-[10px] uppercase px-2 py-1 rounded-full border border-[rgba(120,147,196,0.3)] bg-[rgba(11,18,32,0.85)]">
-                    {os.status.replace('_', ' ')}
+                  <span
+                    className="text-[10px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full border text-[var(--admin-text)]"
+                    style={{ borderColor: osBadge.border, background: osBadge.bg }}
+                  >
+                    {osBadge.label}
                   </span>
                   <button className="p-2 rounded-lg text-[var(--admin-text-muted)] hover:text-white"><MoreVertical className="w-4 h-4" /></button>
                 </div>
@@ -1490,15 +1526,25 @@ function QuotesTab() {
               </tr>
             </thead>
             <tbody>
-              {MOCK_QUOTES.map((quote) => (
-                <tr key={quote.id} className="border-b border-[rgba(120,147,196,0.15)] last:border-b-0 hover:bg-[rgba(39,216,255,0.06)]">
-                  <td className="px-4 py-3 text-xs text-[var(--admin-cyan)] font-semibold">{quote.id}</td>
-                  <td className="px-4 py-3">{quote.client_name}</td>
-                  <td className="px-4 py-3 text-[var(--admin-text-muted)]">{quote.service_type}</td>
-                  <td className="px-4 py-3">{quote.value}</td>
-                  <td className="px-4 py-3"><span className="text-[10px] uppercase px-2 py-1 rounded-full border border-[rgba(120,147,196,0.3)]">{quote.status}</span></td>
-                </tr>
-              ))}
+              {MOCK_QUOTES.map((quote) => {
+                const quoteBadge = getQuoteStatusBadge(quote.status)
+                return (
+                  <tr key={quote.id} className="border-b border-[rgba(120,147,196,0.15)] last:border-b-0 hover:bg-[rgba(39,216,255,0.06)]">
+                    <td className="px-4 py-3 text-xs text-[var(--admin-cyan)] font-semibold">{quote.id}</td>
+                    <td className="px-4 py-3">{quote.client_name}</td>
+                    <td className="px-4 py-3 text-[var(--admin-text-muted)]">{quote.service_type}</td>
+                    <td className="px-4 py-3">{quote.value}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className="text-[10px] uppercase font-semibold tracking-wide px-2.5 py-1 rounded-full border text-[var(--admin-text)]"
+                        style={{ borderColor: quoteBadge.border, background: quoteBadge.bg }}
+                      >
+                        {quoteBadge.label}
+                      </span>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>
